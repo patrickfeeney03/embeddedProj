@@ -1,0 +1,12 @@
+../Middleware/mbedTLS/Src/../Inc/cipher.h:425:19:mbedtls_cipher_get_key_bitlen	3
+../Middleware/mbedTLS/Src/ssl_ticket.c:43:13:mbedtls_zeroize	2
+../Middleware/mbedTLS/Src/ssl_ticket.c:50:6:mbedtls_ssl_ticket_init	1
+../Middleware/mbedTLS/Src/ssl_ticket.c:64:12:ssl_ticket_gen_key	3
+../Middleware/mbedTLS/Src/ssl_ticket.c:94:12:ssl_ticket_update_keys	4
+../Middleware/mbedTLS/Src/ssl_ticket.c:122:5:mbedtls_ssl_ticket_setup	9
+../Middleware/mbedTLS/Src/ssl_ticket.c:169:12:ssl_save_session	5
+../Middleware/mbedTLS/Src/ssl_ticket.c:213:12:ssl_load_session	8
+../Middleware/mbedTLS/Src/ssl_ticket.c:285:5:mbedtls_ssl_ticket_write	10
+../Middleware/mbedTLS/Src/ssl_ticket.c:367:32:ssl_ticket_select_key	3
+../Middleware/mbedTLS/Src/ssl_ticket.c:383:5:mbedtls_ssl_ticket_parse	13
+../Middleware/mbedTLS/Src/ssl_ticket.c:477:6:mbedtls_ssl_ticket_free	1

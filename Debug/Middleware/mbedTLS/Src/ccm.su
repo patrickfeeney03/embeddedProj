@@ -1,0 +1,8 @@
+../Middleware/mbedTLS/Src/ccm.c:53:13:mbedtls_zeroize	24	static
+../Middleware/mbedTLS/Src/ccm.c:63:6:mbedtls_ccm_init	16	static
+../Middleware/mbedTLS/Src/ccm.c:68:5:mbedtls_ccm_setkey	32	static
+../Middleware/mbedTLS/Src/ccm.c:100:6:mbedtls_ccm_free	16	static
+../Middleware/mbedTLS/Src/ccm.c:137:12:ccm_auth_crypt	120	static
+../Middleware/mbedTLS/Src/ccm.c:307:5:mbedtls_ccm_encrypt_and_tag	56	static
+../Middleware/mbedTLS/Src/ccm.c:320:5:mbedtls_ccm_auth_decrypt	88	static
+../Middleware/mbedTLS/Src/ccm.c:400:5:mbedtls_ccm_self_test	160	static

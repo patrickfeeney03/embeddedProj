@@ -1,0 +1,12 @@
+../Middleware/mbedTLS/Src/ecdsa.c:49:12:derive_mpi	5
+../Middleware/mbedTLS/Src/ecdsa.c:72:5:mbedtls_ecdsa_sign	21
+../Middleware/mbedTLS/Src/ecdsa.c:161:5:mbedtls_ecdsa_sign_det	5
+../Middleware/mbedTLS/Src/ecdsa.c:199:5:mbedtls_ecdsa_verify	17
+../Middleware/mbedTLS/Src/ecdsa.c:284:12:ecdsa_signature_to_asn1	5
+../Middleware/mbedTLS/Src/ecdsa.c:308:5:mbedtls_ecdsa_write_signature	2
+../Middleware/mbedTLS/Src/ecdsa.c:344:5:mbedtls_ecdsa_write_signature_det	1
+../Middleware/mbedTLS/Src/ecdsa.c:357:5:mbedtls_ecdsa_read_signature	7
+../Middleware/mbedTLS/Src/ecdsa.c:408:5:mbedtls_ecdsa_genkey	3
+../Middleware/mbedTLS/Src/ecdsa.c:418:5:mbedtls_ecdsa_from_keypair	4
+../Middleware/mbedTLS/Src/ecdsa.c:435:6:mbedtls_ecdsa_init	1
+../Middleware/mbedTLS/Src/ecdsa.c:443:6:mbedtls_ecdsa_free	1

@@ -1,0 +1,7 @@
+../Middleware/mbedTLS/Src/xtea.c:46:13:mbedtls_zeroize	24	static
+../Middleware/mbedTLS/Src/xtea.c:73:6:mbedtls_xtea_init	16	static
+../Middleware/mbedTLS/Src/xtea.c:78:6:mbedtls_xtea_free	16	static
+../Middleware/mbedTLS/Src/xtea.c:89:6:mbedtls_xtea_setup	24	static
+../Middleware/mbedTLS/Src/xtea.c:104:5:mbedtls_xtea_crypt_ecb	56	static
+../Middleware/mbedTLS/Src/xtea.c:147:5:mbedtls_xtea_crypt_cbc	40	static
+../Middleware/mbedTLS/Src/xtea.c:240:5:mbedtls_xtea_self_test	48	static

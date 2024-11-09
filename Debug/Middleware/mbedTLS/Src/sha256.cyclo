@@ -1,0 +1,10 @@
+../Middleware/mbedTLS/Src/sha256.c:54:13:mbedtls_zeroize	2
+../Middleware/mbedTLS/Src/sha256.c:81:6:mbedtls_sha256_init	1
+../Middleware/mbedTLS/Src/sha256.c:86:6:mbedtls_sha256_free	2
+../Middleware/mbedTLS/Src/sha256.c:94:6:mbedtls_sha256_clone	1
+../Middleware/mbedTLS/Src/sha256.c:103:6:mbedtls_sha256_starts	2
+../Middleware/mbedTLS/Src/sha256.c:182:6:mbedtls_sha256_process	6
+../Middleware/mbedTLS/Src/sha256.c:241:6:mbedtls_sha256_update	7
+../Middleware/mbedTLS/Src/sha256.c:290:6:mbedtls_sha256_finish	3
+../Middleware/mbedTLS/Src/sha256.c:326:6:mbedtls_sha256	1
+../Middleware/mbedTLS/Src/sha256.c:392:5:mbedtls_sha256_self_test	11

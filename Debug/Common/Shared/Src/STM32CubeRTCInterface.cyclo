@@ -1,0 +1,4 @@
+../Common/Shared/Src/STM32CubeRTCInterface.c:69:5:TimingSystemSetSystemTime	4
+../Common/Shared/Src/STM32CubeRTCInterface.c:113:6:RTC_CalendarShow	1
+../Common/Shared/Src/STM32CubeRTCInterface.c:136:9:TimingSystemGetSystemTime	3
+../Common/Shared/Src/STM32CubeRTCInterface.c:172:8:SynchronizationAgentConvertNTPTime2EpochTime	2

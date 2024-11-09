@@ -1,0 +1,4 @@
+../Common/Shared/Src/wifi_net.c:69:5:wifi_net_if_init	88	static
+../Common/Shared/Src/wifi_net.c:156:5:net_if_init	104	static
+../Common/Shared/Src/wifi_net.c:244:5:net_if_deinit	16	static
+../Common/Shared/Src/wifi_net.c:250:5:net_if_reinit	40	static

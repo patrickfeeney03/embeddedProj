@@ -1,0 +1,9 @@
+../Middleware/mbedTLS/Src/../Inc/ssl_internal.h:600:19:mbedtls_ssl_safer_memcmp	40	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:47:13:mbedtls_zeroize	24	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:78:6:mbedtls_ssl_cookie_init	16	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:91:6:mbedtls_ssl_cookie_set_timeout	16	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:96:6:mbedtls_ssl_cookie_free	16	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:107:5:mbedtls_ssl_cookie_setup	72	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:133:12:ssl_cookie_hmac	56	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:160:5:mbedtls_ssl_cookie_write	48	static
+../Middleware/mbedTLS/Src/ssl_cookie.c:206:5:mbedtls_ssl_cookie_check	80	static

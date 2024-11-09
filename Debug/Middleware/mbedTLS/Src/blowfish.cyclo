@@ -1,0 +1,11 @@
+../Middleware/mbedTLS/Src/blowfish.c:43:13:mbedtls_zeroize	2
+../Middleware/mbedTLS/Src/blowfish.c:81:17:F	1
+../Middleware/mbedTLS/Src/blowfish.c:100:13:blowfish_enc	2
+../Middleware/mbedTLS/Src/blowfish.c:129:13:blowfish_dec	2
+../Middleware/mbedTLS/Src/blowfish.c:158:6:mbedtls_blowfish_init	1
+../Middleware/mbedTLS/Src/blowfish.c:163:6:mbedtls_blowfish_free	2
+../Middleware/mbedTLS/Src/blowfish.c:174:5:mbedtls_blowfish_setkey	12
+../Middleware/mbedTLS/Src/blowfish.c:232:5:mbedtls_blowfish_crypt_ecb	2
+../Middleware/mbedTLS/Src/blowfish.c:261:5:mbedtls_blowfish_crypt_cbc	7
+../Middleware/mbedTLS/Src/blowfish.c:315:5:mbedtls_blowfish_crypt_cfb64	6
+../Middleware/mbedTLS/Src/blowfish.c:363:5:mbedtls_blowfish_crypt_ctr	5

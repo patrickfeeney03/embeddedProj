@@ -1,0 +1,14 @@
+../Middleware/mbedTLS/Src/hmac_drbg.c:54:13:mbedtls_zeroize	2
+../Middleware/mbedTLS/Src/hmac_drbg.c:61:6:mbedtls_hmac_drbg_init	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:73:6:mbedtls_hmac_drbg_update	5
+../Middleware/mbedTLS/Src/hmac_drbg.c:101:5:mbedtls_hmac_drbg_seed_buf	2
+../Middleware/mbedTLS/Src/hmac_drbg.c:126:5:mbedtls_hmac_drbg_reseed	6
+../Middleware/mbedTLS/Src/hmac_drbg.c:167:5:mbedtls_hmac_drbg_seed	5
+../Middleware/mbedTLS/Src/hmac_drbg.c:223:6:mbedtls_hmac_drbg_set_prediction_resistance	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:232:6:mbedtls_hmac_drbg_set_entropy_len	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:240:6:mbedtls_hmac_drbg_set_reseed_interval	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:249:5:mbedtls_hmac_drbg_random_with_add	10
+../Middleware/mbedTLS/Src/hmac_drbg.c:309:5:mbedtls_hmac_drbg_random	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:332:6:mbedtls_hmac_drbg_free	2
+../Middleware/mbedTLS/Src/hmac_drbg.c:450:12:hmac_drbg_self_test_entropy	1
+../Middleware/mbedTLS/Src/hmac_drbg.c:469:5:mbedtls_hmac_drbg_self_test	24

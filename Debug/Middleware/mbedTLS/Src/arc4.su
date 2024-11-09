@@ -1,0 +1,6 @@
+../Middleware/mbedTLS/Src/arc4.c:51:13:mbedtls_zeroize	24	static
+../Middleware/mbedTLS/Src/arc4.c:55:6:mbedtls_arc4_init	16	static
+../Middleware/mbedTLS/Src/arc4.c:60:6:mbedtls_arc4_free	16	static
+../Middleware/mbedTLS/Src/arc4.c:71:6:mbedtls_arc4_setup	48	static
+../Middleware/mbedTLS/Src/arc4.c:101:5:mbedtls_arc4_crypt	48	static
+../Middleware/mbedTLS/Src/arc4.c:162:5:mbedtls_arc4_self_test	304	static

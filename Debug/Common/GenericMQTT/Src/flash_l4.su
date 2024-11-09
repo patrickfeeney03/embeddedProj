@@ -1,0 +1,10 @@
+../Common/GenericMQTT/Src/flash_l4.c:78:5:FLASH_unlock_erase	48	static
+../Common/GenericMQTT/Src/flash_l4.c:128:12:FLASH_write_at	40	static,ignoring_inline_asm
+../Common/GenericMQTT/Src/flash_l4.c:175:10:FLASH_get_bank	24	static
+../Common/GenericMQTT/Src/flash_l4.c:199:12:FLASH_get_pageInBank	24	static
+../Common/GenericMQTT/Src/flash_l4.c:231:5:FLASH_update	2096	static
+../Common/GenericMQTT/Src/flash_l4.c:287:17:GetPage	24	static
+../Common/GenericMQTT/Src/flash_l4.c:310:17:GetBank	24	static
+../Common/GenericMQTT/Src/flash_l4.c:348:10:FLASH_Init	16	static
+../Common/GenericMQTT/Src/flash_l4.c:383:10:FLASH_Erase_Size	56	static
+../Common/GenericMQTT/Src/flash_l4.c:446:10:FLASH_Write	32	static

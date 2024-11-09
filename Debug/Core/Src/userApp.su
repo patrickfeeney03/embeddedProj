@@ -1,0 +1,8 @@
+../Core/Src/userApp.c:60:6:HAL_GPIO_EXTI_Callback	24	static,ignoring_inline_asm
+../Core/Src/userApp.c:90:6:HAL_RTCEx_WakeUpTimerEventCallback	24	static,ignoring_inline_asm
+../Core/Src/userApp.c:103:6:subscribeMessageHandler	16	static
+../Core/Src/userApp.c:122:13:temperatureTask	80	static
+../Core/Src/userApp.c:148:13:RTC_Task	112	static
+../Core/Src/userApp.c:178:13:initTask	32	static
+../Core/Src/userApp.c:222:6:userApp	16	static
+../Core/Src/userApp.c:238:6:brokerConnect	96	static

@@ -1,0 +1,10 @@
+../Middleware/mbedTLS/Src/../Inc/pk.h:139:36:mbedtls_pk_rsa	16	static
+../Middleware/mbedTLS/Src/../Inc/pk.h:152:36:mbedtls_pk_ec	16	static
+../Middleware/mbedTLS/Src/pkwrite.c:64:12:pk_write_rsa_pubkey	32	static
+../Middleware/mbedTLS/Src/pkwrite.c:85:12:pk_write_ec_pubkey	176	static
+../Middleware/mbedTLS/Src/pkwrite.c:113:12:pk_write_ec_param	40	static
+../Middleware/mbedTLS/Src/pkwrite.c:130:5:mbedtls_pk_write_pubkey	32	static
+../Middleware/mbedTLS/Src/pkwrite.c:151:5:mbedtls_pk_write_pubkey_der	56	static
+../Middleware/mbedTLS/Src/pkwrite.c:199:5:mbedtls_pk_write_key_der	56	static
+../Middleware/mbedTLS/Src/pkwrite.c:378:5:mbedtls_pk_write_pubkey_pem	2136	static
+../Middleware/mbedTLS/Src/pkwrite.c:400:5:mbedtls_pk_write_key_pem	5736	static

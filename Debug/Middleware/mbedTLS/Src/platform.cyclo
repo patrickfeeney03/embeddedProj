@@ -1,0 +1,2 @@
+../Middleware/mbedTLS/Src/platform.c:311:5:mbedtls_platform_setup	1
+../Middleware/mbedTLS/Src/platform.c:321:6:mbedtls_platform_teardown	1

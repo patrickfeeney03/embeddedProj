@@ -1,0 +1,2 @@
+../Common/Shared/Src/sensors_data.c:76:5:init_sensors	16	static
+../Common/Shared/Src/sensors_data.c:129:5:PrepareSensorsData	24	static
