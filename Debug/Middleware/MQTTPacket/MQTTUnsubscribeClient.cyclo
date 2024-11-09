@@ -1,3 +1,0 @@
-../Middleware/MQTTPacket/MQTTUnsubscribeClient.c:29:5:MQTTSerialize_unsubscribeLength	2
-../Middleware/MQTTPacket/MQTTUnsubscribeClient.c:50:5:MQTTSerialize_unsubscribe	3
-../Middleware/MQTTPacket/MQTTUnsubscribeClient.c:93:5:MQTTDeserialize_unsuback	2

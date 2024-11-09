@@ -1,8 +1,0 @@
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:51:15:VL53L0X_check_part_used	3
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:82:15:VL53L0X_get_device_info	8
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:129:15:VL53L0X_get_device_error_string	16
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:208:15:VL53L0X_get_range_status_string	7
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:250:15:VL53L0X_get_pal_error_string	19
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:340:15:VL53L0X_get_pal_state_string	11
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:386:15:VL53L0X_get_sequence_steps_info	6
-../Drivers/BSP/Components/Common/vl53l0x_api_strings.c:425:15:VL53L0X_get_limit_check_info	7

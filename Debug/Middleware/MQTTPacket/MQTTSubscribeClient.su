@@ -1,3 +1,0 @@
-../Middleware/MQTTPacket/MQTTSubscribeClient.c:29:5:MQTTSerialize_subscribeLength	24	static
-../Middleware/MQTTPacket/MQTTSubscribeClient.c:51:5:MQTTSerialize_subscribe	48	static
-../Middleware/MQTTPacket/MQTTSubscribeClient.c:101:5:MQTTDeserialize_suback	48	static

@@ -8,6 +8,7 @@
 #ifndef INC_USERAPP_H_
 #define INC_USERAPP_H_
 
+#include "main.h"
 #include <stdio.h>
 #include <string.h>
 #include "wifi.h"
@@ -37,8 +38,8 @@
 #define BROKER_CONNECT_FAIL		-1
 
 void userApp();
+void TIM6_Handler();
 void brokerConnect(MQTTClient * client);
 extern int _write(int file, char *ptr, int len);
-void TIM6_Handler();
 
 #endif /* INC_USERAPP_H_ */

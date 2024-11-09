@@ -1,6 +1,0 @@
-../Middleware/mbedTLS/Src/arc4.c:51:13:mbedtls_zeroize	2
-../Middleware/mbedTLS/Src/arc4.c:55:6:mbedtls_arc4_init	1
-../Middleware/mbedTLS/Src/arc4.c:60:6:mbedtls_arc4_free	2
-../Middleware/mbedTLS/Src/arc4.c:71:6:mbedtls_arc4_setup	4
-../Middleware/mbedTLS/Src/arc4.c:101:5:mbedtls_arc4_crypt	2
-../Middleware/mbedTLS/Src/arc4.c:162:5:mbedtls_arc4_self_test	7

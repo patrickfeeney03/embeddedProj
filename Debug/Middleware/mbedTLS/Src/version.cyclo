@@ -1,3 +1,0 @@
-../Middleware/mbedTLS/Src/version.c:33:14:mbedtls_version_get_number	1
-../Middleware/mbedTLS/Src/version.c:38:6:mbedtls_version_get_string	1
-../Middleware/mbedTLS/Src/version.c:44:6:mbedtls_version_get_string_full	1

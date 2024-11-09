@@ -1,6 +1,0 @@
-../Middleware/mbedTLS/Src/ssl_cache.c:46:6:mbedtls_ssl_cache_init	1
-../Middleware/mbedTLS/Src/ssl_cache.c:58:5:mbedtls_ssl_cache_get	11
-../Middleware/mbedTLS/Src/ssl_cache.c:137:5:mbedtls_ssl_cache_set	15
-../Middleware/mbedTLS/Src/ssl_cache.c:286:6:mbedtls_ssl_cache_set_timeout	2
-../Middleware/mbedTLS/Src/ssl_cache.c:294:6:mbedtls_ssl_cache_set_max_entries	2
-../Middleware/mbedTLS/Src/ssl_cache.c:301:6:mbedtls_ssl_cache_free	2

@@ -84,6 +84,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	}
 }
 
+void TIM6_Handler() {
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
 /*--------------------------------------------------------------------
  * RTC timer event interrupt handler callback function
  * Runs every second and gives a semaphore if the RTC task is running
