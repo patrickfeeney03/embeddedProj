@@ -27,8 +27,9 @@ extern int wifi_net_if_init(void * if_ctxt);
 //RTOS task function prototypes and object declarations
 static void initTask(void * pvParameters);
 static void temperatureTask(void * pvParameters);
+static void humidityTask(void * pvParameters);
 static void RTC_Task(void * pvParameters);
-SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL;
+SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL;
 
 uint8_t RTC_TaskRunning = 0;
 
@@ -122,7 +123,7 @@ void subscribeMessageHandler(MessageData* data)
 static void temperatureTask(void * pvParameters) {
 	MQTTMessage mqmsg;
 	char temperature[25];
-	printf("Starting Publish Task\r\n");
+	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
 		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
@@ -136,6 +137,28 @@ static void temperatureTask(void * pvParameters) {
 			mqmsg.payloadlen = strlen(temperature);
 
 			//change the device api label to match your Ubidots configuration
+			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
+		}
+		vTaskDelay(pdMS_TO_TICKS(100));
+	}
+}
+
+static void humidityTask(void * pvParameters) {
+	MQTTMessage mqmsg;
+	char humidityStrBuffer[25];
+	printf("Starting Humidity Publish Task\r\n");
+	BSP_HSENSOR_Init();
+	while(1) {
+		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
+			float humidityF = BSP_HSENSOR_ReadHumidity();
+			uint16_t humidityI = humidityF*10;
+			sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
+			printf("Publishing Humidity: %sC\r\n", humidityStrBuffer);
+			memset(&mqmsg, 0, sizeof(MQTTMessage));
+			mqmsg.qos = QOS0;
+			mqmsg.payload = (char *) humidityStrBuffer;
+			mqmsg.payloadlen = strlen(humidityStrBuffer);
+
 			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
