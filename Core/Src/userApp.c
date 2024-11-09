@@ -15,6 +15,7 @@
 
 //Peripheral Handles
 extern UART_HandleTypeDef huart1;
+extern TIM_HandleTypeDef htim6;
 
 //Network variables
 extern int network_wr(Network* n, unsigned char* buffer, int len, int timeout_ms);
@@ -85,6 +86,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 void TIM6_Handler() {
+//	printf("Running TIM6 Handler\r\n");
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
@@ -211,22 +213,28 @@ static void initTask(void * pvParameters) {
 	while(1) {
 		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 		brokerConnect(&client);	//connect to WiFi access point and then to MQTT broker
+
 		publishSemaphore = xSemaphoreCreateBinary();
 		vQueueAddToRegistry(publishSemaphore, "Publish Semaphore");
+
 		oneSecondSemaphore = xSemaphoreCreateBinary();
 		vQueueAddToRegistry(oneSecondSemaphore, "RTC Semaphore");
+
+		publishHumiditySemaphore = xSemaphoreCreateBinary();
+		vQueueAddToRegistry(publishHumiditySemaphore, "Publish Humidity Semaphore");
+
 		if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
 			printf("Temperature task created\n\r");
-		}
-		else {
-			printf("Could not create temperature task\n\r");
-		}
+		} else printf("Could not create temperature task\n\r");
+
 		if(xTaskCreate(RTC_Task, "RTC Task", 500, NULL, configMAX_PRIORITIES - 2, NULL) == pdTRUE) {
 			printf("RTC task created\n\r");
-		}
-		else {
-			printf("Could not create RTC task\n\r");
-		}
+		} else printf("Could not create RTC task\n\r");
+
+		// Humidity
+		if(xTaskCreate(humidityTask, "Humidity Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+			printf("Humidity task created\n\r");
+		} else printf("Could not create Humidity Task\n\r");
 
 		//Subscribe to topics here
 		//change the device name and variable name in the function call to match your Ubidots configuration
@@ -239,6 +247,10 @@ static void initTask(void * pvParameters) {
 			ret = MQTTYield(&client, 500);
 		}
 
+		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
+		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
+		HAL_TIM_Base_Start_IT(&htim6);
+
 		printf("Deleting Init Task\r\n\n");
 		vTaskDelete(NULL);
 	}
@@ -250,6 +262,7 @@ static void initTask(void * pvParameters) {
 -------------------------------------------------*/
 void userApp() {
 	printf("Starting user application\r\n\n");
+
 	xTaskCreate(initTask, "Init Task", 800, NULL, configMAX_PRIORITIES - 1, NULL);
 	vTaskStartScheduler();
 
