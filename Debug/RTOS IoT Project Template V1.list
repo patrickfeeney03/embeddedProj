@@ -7,45 +7,45 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         000140a8  08000190  08000190  00001190  2**4
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       0000183c  08014238  08014238  00015238  2**3
+  2 .rodata       00001894  08014238  08014238  00015238  2**3
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .ARM.extab    00000000  08015a74  08015a74  00017240  2**0
+  3 .ARM.extab    00000000  08015acc  08015acc  00017240  2**0
                   CONTENTS
-  4 .ARM          00000008  08015a74  08015a74  00016a74  2**2
+  4 .ARM          00000008  08015acc  08015acc  00016acc  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .preinit_array 00000000  08015a7c  08015a7c  00017240  2**0
+  5 .preinit_array 00000000  08015ad4  08015ad4  00017240  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .init_array   00000004  08015a7c  08015a7c  00016a7c  2**2
+  6 .init_array   00000004  08015ad4  08015ad4  00016ad4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  7 .fini_array   00000004  08015a80  08015a80  00016a80  2**2
+  7 .fini_array   00000004  08015ad8  08015ad8  00016ad8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  8 .data         00000240  20000000  08015a84  00017000  2**2
+  8 .data         00000240  20000000  08015adc  00017000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          00006b80  20000240  08015cc4  00017240  2**2
+  9 .bss          00006b80  20000240  08015d1c  00017240  2**2
                   ALLOC
- 10 ._user_heap_stack 00000600  20006dc0  08015cc4  00017dc0  2**0
+ 10 ._user_heap_stack 00000600  20006dc0  08015d1c  00017dc0  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  00017240  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00034438  00000000  00000000  00017270  2**0
+ 12 .debug_info   000344d7  00000000  00000000  00017270  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 00007989  00000000  00000000  0004b6a8  2**0
+ 13 .debug_abbrev 000079d6  00000000  00000000  0004b747  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00002dc0  00000000  00000000  00053038  2**3
+ 14 .debug_aranges 00002dc8  00000000  00000000  00053120  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_rnglists 000023bc  00000000  00000000  00055df8  2**0
+ 15 .debug_rnglists 000023c3  00000000  00000000  00055ee8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0000aafb  00000000  00000000  000581b4  2**0
+ 16 .debug_macro  0000aafb  00000000  00000000  000582ab  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0003b326  00000000  00000000  00062caf  2**0
+ 17 .debug_line   0003b368  00000000  00000000  00062da6  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    001167a1  00000000  00000000  0009dfd5  2**0
+ 18 .debug_str    00116817  00000000  00000000  0009e10e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  001b4776  2**0
+ 19 .comment      00000043  00000000  00000000  001b4925  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000d694  00000000  00000000  001b47bc  2**2
+ 20 .debug_frame  0000d6b4  00000000  00000000  001b4968  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 000000b8  00000000  00000000  001c1e50  2**0
+ 21 .debug_line_str 000000b8  00000000  00000000  001c201c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1353,7 +1353,7 @@ int net_init(net_hnd_t * nethnd, net_if_t interface, net_if_init_t *f_netinit)
  8000f6a:	3718      	adds	r7, #24
  8000f6c:	46bd      	mov	sp, r7
  8000f6e:	bd80      	pop	{r7, pc}
- 8000f70:	08015510 	.word	0x08015510
+ 8000f70:	0801556c 	.word	0x0801556c
  8000f74:	08014238 	.word	0x08014238
  8000f78:	08014248 	.word	0x08014248
  8000f7c:	08014268 	.word	0x08014268
@@ -1463,7 +1463,7 @@ int net_get_ip_address(net_hnd_t nethnd, net_ipaddr_t * ipAddress)
  8001006:	3718      	adds	r7, #24
  8001008:	46bd      	mov	sp, r7
  800100a:	bd80      	pop	{r7, pc}
- 800100c:	0801551c 	.word	0x0801551c
+ 800100c:	08015578 	.word	0x08015578
  8001010:	08014238 	.word	0x08014238
  8001014:	08014304 	.word	0x08014304
 
@@ -1549,7 +1549,7 @@ int net_get_mac_address(net_hnd_t nethnd, net_macaddr_t * macAddress)
  8001086:	46bd      	mov	sp, r7
  8001088:	bd80      	pop	{r7, pc}
  800108a:	bf00      	nop
- 800108c:	08015530 	.word	0x08015530
+ 800108c:	0801558c 	.word	0x0801558c
  8001090:	08014238 	.word	0x08014238
  8001094:	08014340 	.word	0x08014340
 
@@ -1623,7 +1623,7 @@ int net_sock_create(net_hnd_t nethnd, net_sockhnd_t * sockhnd, net_proto_t proto
  80010f2:	3718      	adds	r7, #24
  80010f4:	46bd      	mov	sp, r7
  80010f6:	bd80      	pop	{r7, pc}
- 80010f8:	08015544 	.word	0x08015544
+ 80010f8:	080155a0 	.word	0x080155a0
  80010fc:	08014238 	.word	0x08014238
  8001100:	0801437c 	.word	0x0801437c
 
@@ -2138,7 +2138,7 @@ int net_sock_create_wifi(net_hnd_t nethnd, net_sockhnd_t * sockhnd, net_proto_t 
  80013ee:	3720      	adds	r7, #32
  80013f0:	46bd      	mov	sp, r7
  80013f2:	bd80      	pop	{r7, pc}
- 80013f4:	08015554 	.word	0x08015554
+ 80013f4:	080155b0 	.word	0x080155b0
  80013f8:	080143fc 	.word	0x080143fc
  80013fc:	0801440c 	.word	0x0801440c
  8001400:	0800141d 	.word	0x0800141d
@@ -2375,7 +2375,7 @@ int net_sock_open_wifi(net_sockhnd_t sockhnd, const char * hostname, int remotep
  8001564:	46bd      	mov	sp, r7
  8001566:	bd90      	pop	{r4, r7, pc}
  8001568:	08014430 	.word	0x08014430
- 800156c:	0801556c 	.word	0x0801556c
+ 800156c:	080155c8 	.word	0x080155c8
  8001570:	080143fc 	.word	0x080143fc
  8001574:	08014434 	.word	0x08014434
 
@@ -2582,7 +2582,7 @@ int net_sock_recv_tcp_wifi(net_sockhnd_t sockhnd, uint8_t * buf, size_t len)
  80016d2:	46bd      	mov	sp, r7
  80016d4:	bd80      	pop	{r7, pc}
  80016d6:	bf00      	nop
- 80016d8:	08015580 	.word	0x08015580
+ 80016d8:	080155dc 	.word	0x080155dc
  80016dc:	080143fc 	.word	0x080143fc
  80016e0:	08014464 	.word	0x08014464
  80016e4:	080144c0 	.word	0x080144c0
@@ -2824,7 +2824,7 @@ int net_sock_recvfrom_udp_wifi(net_sockhnd_t sockhnd, uint8_t * const buf, size_
  8001886:	3734      	adds	r7, #52	@ 0x34
  8001888:	46bd      	mov	sp, r7
  800188a:	bd90      	pop	{r4, r7, pc}
- 800188c:	08015598 	.word	0x08015598
+ 800188c:	080155f4 	.word	0x080155f4
  8001890:	080143fc 	.word	0x080143fc
  8001894:	08014464 	.word	0x08014464
  8001898:	080144c0 	.word	0x080144c0
@@ -2951,7 +2951,7 @@ int net_sock_send_tcp_wifi( net_sockhnd_t sockhnd, const uint8_t * buf, size_t l
  8001966:	46bd      	mov	sp, r7
  8001968:	bd80      	pop	{r7, pc}
  800196a:	bf00      	nop
- 800196c:	080155b4 	.word	0x080155b4
+ 800196c:	08015610 	.word	0x08015610
  8001970:	080143fc 	.word	0x080143fc
  8001974:	08014540 	.word	0x08014540
 
@@ -3123,7 +3123,7 @@ int net_sock_sendto_udp_wifi(net_sockhnd_t sockhnd, const uint8_t * buf, size_t 
  8001a8a:	46bd      	mov	sp, r7
  8001a8c:	bd90      	pop	{r4, r7, pc}
  8001a8e:	bf00      	nop
- 8001a90:	080155cc 	.word	0x080155cc
+ 8001a90:	08015628 	.word	0x08015628
  8001a94:	080143fc 	.word	0x080143fc
  8001a98:	08014540 	.word	0x08014540
 
@@ -3834,7 +3834,7 @@ int setRTCTimeDateFromNetwork(bool force_apply)
  8001fa0:	701a      	strb	r2, [r3, #0]
  8001fa2:	e07b      	b.n	800209c <setRTCTimeDateFromNetwork+0x46c>
  8001fa4:	20000d18 	.word	0x20000d18
- 8001fa8:	08015610 	.word	0x08015610
+ 8001fa8:	0801566c 	.word	0x0801566c
  8001fac:	08014550 	.word	0x08014550
  8001fb0:	08014560 	.word	0x08014560
  8001fb4:	08014580 	.word	0x08014580
@@ -3843,7 +3843,7 @@ int setRTCTimeDateFromNetwork(bool force_apply)
  8001fc0:	080145c0 	.word	0x080145c0
  8001fc4:	080145cc 	.word	0x080145cc
  8001fc8:	08014618 	.word	0x08014618
- 8001fcc:	080155e8 	.word	0x080155e8
+ 8001fcc:	08015644 	.word	0x08015644
  8001fd0:	08014634 	.word	0x08014634
  8001fd4:	08014650 	.word	0x08014650
  8001fd8:	08014658 	.word	0x08014658
@@ -6142,7 +6142,7 @@ int network_rd(Network* n, unsigned char* buffer, int len, int timeout_ms)
  8002e0a:	3718      	adds	r7, #24
  8002e0c:	46bd      	mov	sp, r7
  8002e0e:	bd80      	pop	{r7, pc}
- 8002e10:	0801562c 	.word	0x0801562c
+ 8002e10:	08015688 	.word	0x08015688
  8002e14:	08014acc 	.word	0x08014acc
  8002e18:	08014adc 	.word	0x08014adc
 
@@ -6195,7 +6195,7 @@ int network_wr(Network* n, unsigned char* buffer, int len, int timeout_ms)
  8002e5e:	3718      	adds	r7, #24
  8002e60:	46bd      	mov	sp, r7
  8002e62:	bd80      	pop	{r7, pc}
- 8002e64:	08015638 	.word	0x08015638
+ 8002e64:	08015694 	.word	0x08015694
  8002e68:	08014acc 	.word	0x08014acc
  8002e6c:	08014af8 	.word	0x08014af8
 
@@ -8111,7 +8111,7 @@ static void temperatureTask(void * pvParameters) {
  80039ce:	6078      	str	r0, [r7, #4]
 	MQTTMessage mqmsg;
 	char temperature[25];
-	printf("Starting Publish Task\r\n");
+	printf("Starting Temperature Publish Task\r\n");
  80039d0:	482c      	ldr	r0, [pc, #176]	@ (8003a84 <temperatureTask+0xbc>)
  80039d2:	f00d fe5d 	bl	8011690 <puts>
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
@@ -8197,9 +8197,9 @@ static void temperatureTask(void * pvParameters) {
  8003a84:	08014b90 	.word	0x08014b90
  8003a88:	20000d0c 	.word	0x20000d0c
  8003a8c:	cccccccd 	.word	0xcccccccd
- 8003a90:	08014ba8 	.word	0x08014ba8
- 8003a94:	08014bc0 	.word	0x08014bc0
- 8003a98:	08014be0 	.word	0x08014be0
+ 8003a90:	08014bb4 	.word	0x08014bb4
+ 8003a94:	08014bcc 	.word	0x08014bcc
+ 8003a98:	08014bec 	.word	0x08014bec
  8003a9c:	20000d2c 	.word	0x20000d2c
 
 08003aa0 <RTC_Task>:
@@ -8291,7 +8291,7 @@ static void RTC_Task(void * pvParameters) {
  8003b40:	20000d10 	.word	0x20000d10
  8003b44:	20000d15 	.word	0x20000d15
  8003b48:	200005ec 	.word	0x200005ec
- 8003b4c:	08014bf4 	.word	0x08014bf4
+ 8003b4c:	08014c50 	.word	0x08014c50
  8003b50:	08014b2c 	.word	0x08014b2c
 
 08003b54 <initTask>:
@@ -8435,26 +8435,26 @@ static void initTask(void * pvParameters) {
 		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
  8003c40:	e78f      	b.n	8003b62 <initTask+0xe>
  8003c42:	bf00      	nop
- 8003c44:	08014c14 	.word	0x08014c14
+ 8003c44:	08014c70 	.word	0x08014c70
  8003c48:	48000400 	.word	0x48000400
  8003c4c:	20000d2c 	.word	0x20000d2c
  8003c50:	20000d0c 	.word	0x20000d0c
- 8003c54:	08014c28 	.word	0x08014c28
+ 8003c54:	08014c84 	.word	0x08014c84
  8003c58:	20000d10 	.word	0x20000d10
- 8003c5c:	08014c3c 	.word	0x08014c3c
- 8003c60:	08014c4c 	.word	0x08014c4c
+ 8003c5c:	08014c98 	.word	0x08014c98
+ 8003c60:	08014ca8 	.word	0x08014ca8
  8003c64:	080039c9 	.word	0x080039c9
- 8003c68:	08014c60 	.word	0x08014c60
- 8003c6c:	08014c7c 	.word	0x08014c7c
- 8003c70:	08014ca0 	.word	0x08014ca0
+ 8003c68:	08014cbc 	.word	0x08014cbc
+ 8003c6c:	08014cd8 	.word	0x08014cd8
+ 8003c70:	08014cfc 	.word	0x08014cfc
  8003c74:	08003aa1 	.word	0x08003aa1
- 8003c78:	08014cac 	.word	0x08014cac
- 8003c7c:	08014cc0 	.word	0x08014cc0
+ 8003c78:	08014d08 	.word	0x08014d08
+ 8003c7c:	08014d1c 	.word	0x08014d1c
  8003c80:	08003925 	.word	0x08003925
- 8003c84:	08014cdc 	.word	0x08014cdc
- 8003c88:	08014cf8 	.word	0x08014cf8
- 8003c8c:	08014d14 	.word	0x08014d14
- 8003c90:	08014d30 	.word	0x08014d30
+ 8003c84:	08014d38 	.word	0x08014d38
+ 8003c88:	08014d54 	.word	0x08014d54
+ 8003c8c:	08014d70 	.word	0x08014d70
+ 8003c90:	08014d8c 	.word	0x08014d8c
 
 08003c94 <userApp>:
 
@@ -8486,8 +8486,8 @@ void userApp() {
  8003cba:	bf00      	nop
  8003cbc:	e7fd      	b.n	8003cba <userApp+0x26>
  8003cbe:	bf00      	nop
- 8003cc0:	08014d48 	.word	0x08014d48
- 8003cc4:	08014d64 	.word	0x08014d64
+ 8003cc0:	08014da4 	.word	0x08014da4
+ 8003cc4:	08014dc0 	.word	0x08014dc0
  8003cc8:	08003b55 	.word	0x08003b55
 
 08003ccc <brokerConnect>:
@@ -8820,41 +8820,41 @@ void brokerConnect(MQTTClient * client) {
  8003ebe:	46bd      	mov	sp, r7
  8003ec0:	bdb0      	pop	{r4, r5, r7, pc}
  8003ec2:	bf00      	nop
- 8003ec4:	08014d70 	.word	0x08014d70
- 8003ec8:	08014d8c 	.word	0x08014d8c
- 8003ecc:	08014d94 	.word	0x08014d94
- 8003ed0:	08014d98 	.word	0x08014d98
- 8003ed4:	08014dbc 	.word	0x08014dbc
- 8003ed8:	08014dc0 	.word	0x08014dc0
+ 8003ec4:	08014dcc 	.word	0x08014dcc
+ 8003ec8:	08014de8 	.word	0x08014de8
+ 8003ecc:	08014df0 	.word	0x08014df0
+ 8003ed0:	08014df4 	.word	0x08014df4
+ 8003ed4:	08014e18 	.word	0x08014e18
+ 8003ed8:	08014e1c 	.word	0x08014e1c
  8003edc:	0800230d 	.word	0x0800230d
  8003ee0:	20000d18 	.word	0x20000d18
- 8003ee4:	08014ddc 	.word	0x08014ddc
- 8003ee8:	08014de4 	.word	0x08014de4
- 8003eec:	08014dec 	.word	0x08014dec
- 8003ef0:	08014e0c 	.word	0x08014e0c
- 8003ef4:	08014e18 	.word	0x08014e18
- 8003ef8:	08014e34 	.word	0x08014e34
- 8003efc:	08014e40 	.word	0x08014e40
- 8003f00:	08014e70 	.word	0x08014e70
- 8003f04:	08014e84 	.word	0x08014e84
+ 8003ee4:	08014e38 	.word	0x08014e38
+ 8003ee8:	08014e40 	.word	0x08014e40
+ 8003eec:	08014e48 	.word	0x08014e48
+ 8003ef0:	08014e68 	.word	0x08014e68
+ 8003ef4:	08014e74 	.word	0x08014e74
+ 8003ef8:	08014e90 	.word	0x08014e90
+ 8003efc:	08014e9c 	.word	0x08014e9c
+ 8003f00:	08014ecc 	.word	0x08014ecc
+ 8003f04:	08014ee0 	.word	0x08014ee0
  8003f08:	200005ec 	.word	0x200005ec
- 8003f0c:	08014e9c 	.word	0x08014e9c
+ 8003f0c:	08014ef8 	.word	0x08014ef8
  8003f10:	20000d28 	.word	0x20000d28
- 8003f14:	08014ec0 	.word	0x08014ec0
- 8003f18:	08014ee0 	.word	0x08014ee0
- 8003f1c:	08014f0c 	.word	0x08014f0c
- 8003f20:	08014f1c 	.word	0x08014f1c
- 8003f24:	08014f3c 	.word	0x08014f3c
+ 8003f14:	08014f1c 	.word	0x08014f1c
+ 8003f18:	08014f3c 	.word	0x08014f3c
+ 8003f1c:	08014f68 	.word	0x08014f68
+ 8003f20:	08014f78 	.word	0x08014f78
+ 8003f24:	08014f98 	.word	0x08014f98
  8003f28:	20000d1c 	.word	0x20000d1c
  8003f2c:	08002dc9 	.word	0x08002dc9
  8003f30:	08002e1d 	.word	0x08002e1d
  8003f34:	200012a8 	.word	0x200012a8
  8003f38:	20001050 	.word	0x20001050
  8003f3c:	20000004 	.word	0x20000004
- 8003f40:	08014f60 	.word	0x08014f60
- 8003f44:	08014f84 	.word	0x08014f84
- 8003f48:	08014fa4 	.word	0x08014fa4
- 8003f4c:	08014fcc 	.word	0x08014fcc
+ 8003f40:	08014fbc 	.word	0x08014fbc
+ 8003f44:	08014fe0 	.word	0x08014fe0
+ 8003f48:	08015000 	.word	0x08015000
+ 8003f4c:	08015028 	.word	0x08015028
 
 08003f50 <Reset_Handler>:
  8003f50:	f8df d034 	ldr.w	sp, [pc, #52]	@ 8003f88 <LoopForever+0x2>
@@ -8894,7 +8894,7 @@ void brokerConnect(MQTTClient * client) {
  8003f88:	20018000 	.word	0x20018000
  8003f8c:	20000000 	.word	0x20000000
  8003f90:	20000240 	.word	0x20000240
- 8003f94:	08015a84 	.word	0x08015a84
+ 8003f94:	08015adc 	.word	0x08015adc
  8003f98:	20000240 	.word	0x20000240
  8003f9c:	20006dc0 	.word	0x20006dc0
 
@@ -9959,8 +9959,8 @@ void brokerConnect(MQTTClient * client) {
  8004886:	3710      	adds	r7, #16
  8004888:	46bd      	mov	sp, r7
  800488a:	bd80      	pop	{r7, pc}
- 800488c:	08015020 	.word	0x08015020
- 8004890:	08015024 	.word	0x08015024
+ 800488c:	0801507c 	.word	0x0801507c
+ 8004890:	08015080 	.word	0x08015080
 
 08004894 <AT_ParseConnSettings>:
  8004894:	b580      	push	{r7, lr}
@@ -10104,7 +10104,7 @@ void brokerConnect(MQTTClient * client) {
  80049ea:	3710      	adds	r7, #16
  80049ec:	46bd      	mov	sp, r7
  80049ee:	bd80      	pop	{r7, pc}
- 80049f0:	08015020 	.word	0x08015020
+ 80049f0:	0801507c 	.word	0x0801507c
 
 080049f4 <AT_ParseTransportSettings>:
  80049f4:	b580      	push	{r7, lr}
@@ -10239,7 +10239,7 @@ void brokerConnect(MQTTClient * client) {
  8004b26:	3710      	adds	r7, #16
  8004b28:	46bd      	mov	sp, r7
  8004b2a:	bd80      	pop	{r7, pc}
- 8004b2c:	08015020 	.word	0x08015020
+ 8004b2c:	0801507c 	.word	0x0801507c
 
 08004b30 <AT_ParseIsConnected>:
  8004b30:	b480      	push	{r7}
@@ -10337,8 +10337,8 @@ void brokerConnect(MQTTClient * client) {
  8004c02:	371c      	adds	r7, #28
  8004c04:	46bd      	mov	sp, r7
  8004c06:	bd90      	pop	{r4, r7, pc}
- 8004c08:	08015028 	.word	0x08015028
- 8004c0c:	08015034 	.word	0x08015034
+ 8004c08:	08015084 	.word	0x08015084
+ 8004c0c:	08015090 	.word	0x08015090
 
 08004c10 <AT_RequestSendData>:
  8004c10:	b580      	push	{r7, lr}
@@ -10440,8 +10440,8 @@ void brokerConnect(MQTTClient * client) {
  8004cee:	46bd      	mov	sp, r7
  8004cf0:	bd80      	pop	{r7, pc}
  8004cf2:	bf00      	nop
- 8004cf4:	08015028 	.word	0x08015028
- 8004cf8:	08015034 	.word	0x08015034
+ 8004cf4:	08015084 	.word	0x08015084
+ 8004cf8:	08015090 	.word	0x08015090
 
 08004cfc <AT_RequestReceiveData>:
  8004cfc:	b590      	push	{r4, r7, lr}
@@ -10580,8 +10580,8 @@ void brokerConnect(MQTTClient * client) {
  8004e1a:	46bd      	mov	sp, r7
  8004e1c:	bd90      	pop	{r4, r7, pc}
  8004e1e:	bf00      	nop
- 8004e20:	08015028 	.word	0x08015028
- 8004e24:	0801503c 	.word	0x0801503c
+ 8004e20:	08015084 	.word	0x08015084
+ 8004e24:	08015098 	.word	0x08015098
 
 08004e28 <ES_WIFI_Init>:
  8004e28:	b580      	push	{r7, lr}
@@ -10621,7 +10621,7 @@ void brokerConnect(MQTTClient * client) {
  8004e7a:	3710      	adds	r7, #16
  8004e7c:	46bd      	mov	sp, r7
  8004e7e:	bd80      	pop	{r7, pc}
- 8004e80:	08015044 	.word	0x08015044
+ 8004e80:	080150a0 	.word	0x080150a0
 
 08004e84 <ES_WIFI_RegisterBusIO>:
  8004e84:	b480      	push	{r7}
@@ -10762,10 +10762,10 @@ void brokerConnect(MQTTClient * client) {
  8004fc6:	46bd      	mov	sp, r7
  8004fc8:	bd80      	pop	{r7, pc}
  8004fca:	bf00      	nop
- 8004fcc:	08015050 	.word	0x08015050
- 8004fd0:	08015058 	.word	0x08015058
- 8004fd4:	08015060 	.word	0x08015060
- 8004fd8:	08015068 	.word	0x08015068
+ 8004fcc:	080150ac 	.word	0x080150ac
+ 8004fd0:	080150b4 	.word	0x080150b4
+ 8004fd4:	080150bc 	.word	0x080150bc
+ 8004fd8:	080150c4 	.word	0x080150c4
 
 08004fdc <ES_WIFI_IsConnected>:
  8004fdc:	b580      	push	{r7, lr}
@@ -10802,7 +10802,7 @@ void brokerConnect(MQTTClient * client) {
  800502a:	3710      	adds	r7, #16
  800502c:	46bd      	mov	sp, r7
  800502e:	bd80      	pop	{r7, pc}
- 8005030:	0801506c 	.word	0x0801506c
+ 8005030:	080150c8 	.word	0x080150c8
 
 08005034 <ES_WIFI_GetNetworkSettings>:
  8005034:	b580      	push	{r7, lr}
@@ -10838,7 +10838,7 @@ void brokerConnect(MQTTClient * client) {
  800507e:	3710      	adds	r7, #16
  8005080:	46bd      	mov	sp, r7
  8005082:	bd80      	pop	{r7, pc}
- 8005084:	08015074 	.word	0x08015074
+ 8005084:	080150d0 	.word	0x080150d0
 
 08005088 <ES_WIFI_GetMACAddress>:
  8005088:	b580      	push	{r7, lr}
@@ -10879,8 +10879,8 @@ void brokerConnect(MQTTClient * client) {
  80050de:	46bd      	mov	sp, r7
  80050e0:	bd80      	pop	{r7, pc}
  80050e2:	bf00      	nop
- 80050e4:	080150d4 	.word	0x080150d4
- 80050e8:	080150d8 	.word	0x080150d8
+ 80050e4:	08015130 	.word	0x08015130
+ 80050e8:	08015134 	.word	0x08015134
 
 080050ec <ES_WIFI_DNS_LookUp>:
  80050ec:	b580      	push	{r7, lr}
@@ -10923,8 +10923,8 @@ void brokerConnect(MQTTClient * client) {
  8005146:	46bd      	mov	sp, r7
  8005148:	bd80      	pop	{r7, pc}
  800514a:	bf00      	nop
- 800514c:	08015134 	.word	0x08015134
- 8005150:	08015024 	.word	0x08015024
+ 800514c:	08015190 	.word	0x08015190
+ 8005150:	08015080 	.word	0x08015080
 
 08005154 <ES_WIFI_StartClientConnection>:
  8005154:	b590      	push	{r4, r7, lr}
@@ -11073,12 +11073,12 @@ void brokerConnect(MQTTClient * client) {
  80052ae:	46bd      	mov	sp, r7
  80052b0:	bd90      	pop	{r4, r7, pc}
  80052b2:	bf00      	nop
- 80052b4:	0801513c 	.word	0x0801513c
- 80052b8:	08015144 	.word	0x08015144
- 80052bc:	0801514c 	.word	0x0801514c
- 80052c0:	08015154 	.word	0x08015154
- 80052c4:	0801515c 	.word	0x0801515c
- 80052c8:	0801516c 	.word	0x0801516c
+ 80052b4:	08015198 	.word	0x08015198
+ 80052b8:	080151a0 	.word	0x080151a0
+ 80052bc:	080151a8 	.word	0x080151a8
+ 80052c0:	080151b0 	.word	0x080151b0
+ 80052c4:	080151b8 	.word	0x080151b8
+ 80052c8:	080151c8 	.word	0x080151c8
 
 080052cc <ES_WIFI_StopClientConnection>:
  80052cc:	b580      	push	{r7, lr}
@@ -11125,8 +11125,8 @@ void brokerConnect(MQTTClient * client) {
  8005332:	46bd      	mov	sp, r7
  8005334:	bd80      	pop	{r7, pc}
  8005336:	bf00      	nop
- 8005338:	0801513c 	.word	0x0801513c
- 800533c:	08015174 	.word	0x08015174
+ 8005338:	08015198 	.word	0x08015198
+ 800533c:	080151d0 	.word	0x080151d0
 
 08005340 <ES_WIFI_SendData>:
  8005340:	b580      	push	{r7, lr}
@@ -11257,16 +11257,16 @@ void brokerConnect(MQTTClient * client) {
  800547a:	3718      	adds	r7, #24
  800547c:	46bd      	mov	sp, r7
  800547e:	bd80      	pop	{r7, pc}
- 8005480:	0801513c 	.word	0x0801513c
- 8005484:	080152fc 	.word	0x080152fc
- 8005488:	08015304 	.word	0x08015304
- 800548c:	08015310 	.word	0x08015310
- 8005490:	080151c4 	.word	0x080151c4
- 8005494:	080151f0 	.word	0x080151f0
- 8005498:	08015318 	.word	0x08015318
- 800549c:	08015334 	.word	0x08015334
- 80054a0:	08015350 	.word	0x08015350
- 80054a4:	08015364 	.word	0x08015364
+ 8005480:	08015198 	.word	0x08015198
+ 8005484:	08015358 	.word	0x08015358
+ 8005488:	08015360 	.word	0x08015360
+ 800548c:	0801536c 	.word	0x0801536c
+ 8005490:	08015220 	.word	0x08015220
+ 8005494:	0801524c 	.word	0x0801524c
+ 8005498:	08015374 	.word	0x08015374
+ 800549c:	08015390 	.word	0x08015390
+ 80054a0:	080153ac 	.word	0x080153ac
+ 80054a4:	080153c0 	.word	0x080153c0
 
 080054a8 <ES_WIFI_SendDataTo>:
  80054a8:	b590      	push	{r4, r7, lr}
@@ -11459,16 +11459,16 @@ void brokerConnect(MQTTClient * client) {
  800566e:	371c      	adds	r7, #28
  8005670:	46bd      	mov	sp, r7
  8005672:	bd90      	pop	{r4, r7, pc}
- 8005674:	0801513c 	.word	0x0801513c
- 8005678:	0801514c 	.word	0x0801514c
- 800567c:	08015154 	.word	0x08015154
- 8005680:	0801515c 	.word	0x0801515c
- 8005684:	080152fc 	.word	0x080152fc
- 8005688:	08015304 	.word	0x08015304
- 800568c:	08015310 	.word	0x08015310
- 8005690:	080151c4 	.word	0x080151c4
- 8005694:	080151f0 	.word	0x080151f0
- 8005698:	08015378 	.word	0x08015378
+ 8005674:	08015198 	.word	0x08015198
+ 8005678:	080151a8 	.word	0x080151a8
+ 800567c:	080151b0 	.word	0x080151b0
+ 8005680:	080151b8 	.word	0x080151b8
+ 8005684:	08015358 	.word	0x08015358
+ 8005688:	08015360 	.word	0x08015360
+ 800568c:	0801536c 	.word	0x0801536c
+ 8005690:	08015220 	.word	0x08015220
+ 8005694:	0801524c 	.word	0x0801524c
+ 8005698:	080153d4 	.word	0x080153d4
 
 0800569c <ES_WIFI_ReceiveData>:
  800569c:	b580      	push	{r7, lr}
@@ -11600,16 +11600,16 @@ void brokerConnect(MQTTClient * client) {
  80057da:	46bd      	mov	sp, r7
  80057dc:	bd80      	pop	{r7, pc}
  80057de:	bf00      	nop
- 80057e0:	0801513c 	.word	0x0801513c
- 80057e4:	08015388 	.word	0x08015388
- 80057e8:	08015390 	.word	0x08015390
- 80057ec:	08015398 	.word	0x08015398
- 80057f0:	080151c4 	.word	0x080151c4
- 80057f4:	080151f0 	.word	0x080151f0
- 80057f8:	0801539c 	.word	0x0801539c
- 80057fc:	080153bc 	.word	0x080153bc
- 8005800:	080153d4 	.word	0x080153d4
- 8005804:	080153f4 	.word	0x080153f4
+ 80057e0:	08015198 	.word	0x08015198
+ 80057e4:	080153e4 	.word	0x080153e4
+ 80057e8:	080153ec 	.word	0x080153ec
+ 80057ec:	080153f4 	.word	0x080153f4
+ 80057f0:	08015220 	.word	0x08015220
+ 80057f4:	0801524c 	.word	0x0801524c
+ 80057f8:	080153f8 	.word	0x080153f8
+ 80057fc:	08015418 	.word	0x08015418
+ 8005800:	08015430 	.word	0x08015430
+ 8005804:	08015450 	.word	0x08015450
  8005808:	20001570 	.word	0x20001570
 
 0800580c <ES_WIFI_ReceiveDataFrom>:
@@ -11797,18 +11797,18 @@ void brokerConnect(MQTTClient * client) {
  80059ee:	3728      	adds	r7, #40	@ 0x28
  80059f0:	46bd      	mov	sp, r7
  80059f2:	bd80      	pop	{r7, pc}
- 80059f4:	0801513c 	.word	0x0801513c
- 80059f8:	08015388 	.word	0x08015388
- 80059fc:	080151c4 	.word	0x080151c4
- 8005a00:	080151f0 	.word	0x080151f0
- 8005a04:	08015414 	.word	0x08015414
- 8005a08:	08015390 	.word	0x08015390
- 8005a0c:	08015420 	.word	0x08015420
- 8005a10:	08015398 	.word	0x08015398
- 8005a14:	0801542c 	.word	0x0801542c
- 8005a18:	08015438 	.word	0x08015438
- 8005a1c:	08015228 	.word	0x08015228
- 8005a20:	0801545c 	.word	0x0801545c
+ 80059f4:	08015198 	.word	0x08015198
+ 80059f8:	080153e4 	.word	0x080153e4
+ 80059fc:	08015220 	.word	0x08015220
+ 8005a00:	0801524c 	.word	0x0801524c
+ 8005a04:	08015470 	.word	0x08015470
+ 8005a08:	080153ec 	.word	0x080153ec
+ 8005a0c:	0801547c 	.word	0x0801547c
+ 8005a10:	080153f4 	.word	0x080153f4
+ 8005a14:	08015488 	.word	0x08015488
+ 8005a18:	08015494 	.word	0x08015494
+ 8005a1c:	08015284 	.word	0x08015284
+ 8005a20:	080154b8 	.word	0x080154b8
 
 08005a24 <HAL_Init>:
  8005a24:	b580      	push	{r7, lr}
@@ -15379,7 +15379,7 @@ void brokerConnect(MQTTClient * client) {
  80078fc:	e014      	b.n	8007928 <HAL_RCC_OscConfig+0x298>
  80078fe:	bf00      	nop
  8007900:	40021000 	.word	0x40021000
- 8007904:	08015644 	.word	0x08015644
+ 8007904:	080156a0 	.word	0x080156a0
  8007908:	20000000 	.word	0x20000000
  800790c:	2000006c 	.word	0x2000006c
  8007910:	4ba0      	ldr	r3, [pc, #640]	@ (8007b94 <HAL_RCC_OscConfig+0x504>)
@@ -16163,7 +16163,7 @@ void brokerConnect(MQTTClient * client) {
  8008032:	bd80      	pop	{r7, pc}
  8008034:	40022000 	.word	0x40022000
  8008038:	40021000 	.word	0x40021000
- 800803c:	08015644 	.word	0x08015644
+ 800803c:	080156a0 	.word	0x080156a0
  8008040:	20000000 	.word	0x20000000
  8008044:	2000006c 	.word	0x2000006c
 
@@ -16286,7 +16286,7 @@ void brokerConnect(MQTTClient * client) {
  800814c:	4770      	bx	lr
  800814e:	bf00      	nop
  8008150:	40021000 	.word	0x40021000
- 8008154:	0801565c 	.word	0x0801565c
+ 8008154:	080156b8 	.word	0x080156b8
  8008158:	00f42400 	.word	0x00f42400
  800815c:	007a1200 	.word	0x007a1200
 
@@ -16318,7 +16318,7 @@ void brokerConnect(MQTTClient * client) {
  8008198:	4618      	mov	r0, r3
  800819a:	bd80      	pop	{r7, pc}
  800819c:	40021000 	.word	0x40021000
- 80081a0:	08015654 	.word	0x08015654
+ 80081a0:	080156b0 	.word	0x080156b0
 
 080081a4 <HAL_RCC_GetPCLK2Freq>:
  80081a4:	b580      	push	{r7, lr}
@@ -16336,7 +16336,7 @@ void brokerConnect(MQTTClient * client) {
  80081c4:	4618      	mov	r0, r3
  80081c6:	bd80      	pop	{r7, pc}
  80081c8:	40021000 	.word	0x40021000
- 80081cc:	08015654 	.word	0x08015654
+ 80081cc:	080156b0 	.word	0x080156b0
 
 080081d0 <HAL_RCC_GetClockConfig>:
  80081d0:	b480      	push	{r7}
@@ -24757,7 +24757,7 @@ void brokerConnect(MQTTClient * client) {
  800cbea:	46bd      	mov	sp, r7
  800cbec:	bd80      	pop	{r7, pc}
  800cbee:	bf00      	nop
- 800cbf0:	0801546c 	.word	0x0801546c
+ 800cbf0:	080154c8 	.word	0x080154c8
 
 0800cbf4 <MQTTConnect>:
  800cbf4:	b580      	push	{r7, lr}
@@ -25469,8 +25469,8 @@ void brokerConnect(MQTTClient * client) {
  800d24a:	3728      	adds	r7, #40	@ 0x28
  800d24c:	46bd      	mov	sp, r7
  800d24e:	bd80      	pop	{r7, pc}
- 800d250:	080154c4 	.word	0x080154c4
- 800d254:	080154cc 	.word	0x080154cc
+ 800d250:	08015520 	.word	0x08015520
+ 800d254:	08015528 	.word	0x08015528
 
 0800d258 <MQTTDeserialize_connack>:
  800d258:	b580      	push	{r7, lr}
@@ -28241,7 +28241,7 @@ void brokerConnect(MQTTClient * client) {
  800ea4e:	3718      	adds	r7, #24
  800ea50:	46bd      	mov	sp, r7
  800ea52:	bd80      	pop	{r7, pc}
- 800ea54:	080154d4 	.word	0x080154d4
+ 800ea54:	08015530 	.word	0x08015530
  800ea58:	0800f05d 	.word	0x0800f05d
  800ea5c:	20001704 	.word	0x20001704
  800ea60:	200015e0 	.word	0x200015e0
@@ -31978,7 +31978,7 @@ void brokerConnect(MQTTClient * client) {
  8010b58:	d1f6      	bne.n	8010b48 <_strtol_l.constprop.0+0xd8>
  8010b5a:	f8c8 1000 	str.w	r1, [r8]
  8010b5e:	e794      	b.n	8010a8a <_strtol_l.constprop.0+0x1a>
- 8010b60:	0801568d 	.word	0x0801568d
+ 8010b60:	080156e9 	.word	0x080156e9
 
 08010b64 <_strtol_r>:
  8010b64:	f7ff bf84 	b.w	8010a70 <_strtol_l.constprop.0>
@@ -32414,11 +32414,11 @@ void brokerConnect(MQTTClient * client) {
  8010f80:	e7ee      	b.n	8010f60 <_printf_float+0x2a4>
  8010f82:	bf00      	nop
  8010f84:	7fefffff 	.word	0x7fefffff
- 8010f88:	0801578d 	.word	0x0801578d
- 8010f8c:	08015791 	.word	0x08015791
- 8010f90:	08015795 	.word	0x08015795
- 8010f94:	08015799 	.word	0x08015799
- 8010f98:	08015a6f 	.word	0x08015a6f
+ 8010f88:	080157e9 	.word	0x080157e9
+ 8010f8c:	080157ed 	.word	0x080157ed
+ 8010f90:	080157f1 	.word	0x080157f1
+ 8010f94:	080157f5 	.word	0x080157f5
+ 8010f98:	08015ac7 	.word	0x08015ac7
  8010f9c:	6da3      	ldr	r3, [r4, #88]	@ 0x58
  8010f9e:	f8dd a028 	ldr.w	sl, [sp, #40]	@ 0x28
  8010fa2:	4553      	cmp	r3, sl
@@ -32898,8 +32898,8 @@ void brokerConnect(MQTTClient * client) {
  801141c:	f104 0619 	add.w	r6, r4, #25
  8011420:	e7f5      	b.n	801140e <_printf_i+0x222>
  8011422:	bf00      	nop
- 8011424:	0801579d 	.word	0x0801579d
- 8011428:	080157ae 	.word	0x080157ae
+ 8011424:	080157f9 	.word	0x080157f9
+ 8011428:	0801580a 	.word	0x0801580a
 
 0801142c <std>:
  801142c:	2300      	movs	r3, #0
@@ -33600,8 +33600,8 @@ void brokerConnect(MQTTClient * client) {
  8011a54:	e8bd 41f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, lr}
  8011a58:	f000 b806 	b.w	8011a68 <__strtok_r>
  8011a5c:	200001f0 	.word	0x200001f0
- 8011a60:	080157bf 	.word	0x080157bf
- 8011a64:	080157d6 	.word	0x080157d6
+ 8011a60:	0801581b 	.word	0x0801581b
+ 8011a64:	08015832 	.word	0x08015832
 
 08011a68 <__strtok_r>:
  8011a68:	b5f0      	push	{r4, r5, r6, r7, lr}
@@ -33861,10 +33861,10 @@ void brokerConnect(MQTTClient * client) {
  8011c82:	4798      	blx	r3
  8011c84:	3601      	adds	r6, #1
  8011c86:	e7f2      	b.n	8011c6e <__libc_init_array+0x1e>
- 8011c88:	08015a7c 	.word	0x08015a7c
- 8011c8c:	08015a7c 	.word	0x08015a7c
- 8011c90:	08015a7c 	.word	0x08015a7c
- 8011c94:	08015a80 	.word	0x08015a80
+ 8011c88:	08015ad4 	.word	0x08015ad4
+ 8011c8c:	08015ad4 	.word	0x08015ad4
+ 8011c90:	08015ad4 	.word	0x08015ad4
+ 8011c94:	08015ad8 	.word	0x08015ad8
 
 08011c98 <memcpy>:
  8011c98:	440a      	add	r2, r1
@@ -33900,9 +33900,9 @@ void brokerConnect(MQTTClient * client) {
  8011cdc:	e7f4      	b.n	8011cc8 <__assert_func+0x14>
  8011cde:	bf00      	nop
  8011ce0:	200001f0 	.word	0x200001f0
- 8011ce4:	08015875 	.word	0x08015875
- 8011ce8:	08015847 	.word	0x08015847
- 8011cec:	0801583a 	.word	0x0801583a
+ 8011ce4:	080158d1 	.word	0x080158d1
+ 8011ce8:	080158a3 	.word	0x080158a3
+ 8011cec:	08015896 	.word	0x08015896
 
 08011cf0 <quorem>:
  8011cf0:	e92d 4ff7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -34288,15 +34288,15 @@ void brokerConnect(MQTTClient * client) {
  80120bc:	3fc68a28 	.word	0x3fc68a28
  80120c0:	509f79fb 	.word	0x509f79fb
  80120c4:	3fd34413 	.word	0x3fd34413
- 80120c8:	080157bf 	.word	0x080157bf
- 80120cc:	08015883 	.word	0x08015883
+ 80120c8:	0801581b 	.word	0x0801581b
+ 80120cc:	080158df 	.word	0x080158df
  80120d0:	7ff00000 	.word	0x7ff00000
- 80120d4:	08015a70 	.word	0x08015a70
+ 80120d4:	08015ac8 	.word	0x08015ac8
  80120d8:	3ff80000 	.word	0x3ff80000
- 80120dc:	08015980 	.word	0x08015980
- 80120e0:	080158db 	.word	0x080158db
- 80120e4:	0801587f 	.word	0x0801587f
- 80120e8:	08015a6f 	.word	0x08015a6f
+ 80120dc:	080159d8 	.word	0x080159d8
+ 80120e0:	08015937 	.word	0x08015937
+ 80120e4:	080158db 	.word	0x080158db
+ 80120e8:	08015ac7 	.word	0x08015ac7
  80120ec:	f8db 301c 	ldr.w	r3, [fp, #28]
  80120f0:	6018      	str	r0, [r3, #0]
  80120f2:	9b07      	ldr	r3, [sp, #28]
@@ -34548,8 +34548,8 @@ void brokerConnect(MQTTClient * client) {
  80123b2:	f7ee f931 	bl	8000618 <__aeabi_dmul>
  80123b6:	e9cd 0102 	strd	r0, r1, [sp, #8]
  80123ba:	e7c4      	b.n	8012346 <_dtoa_r+0x546>
- 80123bc:	08015980 	.word	0x08015980
- 80123c0:	08015958 	.word	0x08015958
+ 80123bc:	080159d8 	.word	0x080159d8
+ 80123c0:	080159b0 	.word	0x080159b0
  80123c4:	3ff00000 	.word	0x3ff00000
  80123c8:	40240000 	.word	0x40240000
  80123cc:	401c0000 	.word	0x401c0000
@@ -35151,8 +35151,8 @@ void brokerConnect(MQTTClient * client) {
  8012978:	f000 f8c4 	bl	8012b04 <__multadd>
  801297c:	4681      	mov	r9, r0
  801297e:	e7ea      	b.n	8012956 <_dtoa_r+0xb56>
- 8012980:	080158db 	.word	0x080158db
- 8012984:	08015876 	.word	0x08015876
+ 8012980:	08015937 	.word	0x08015937
+ 8012984:	080158d2 	.word	0x080158d2
 
 08012988 <_free_r>:
  8012988:	b538      	push	{r3, r4, r5, lr}
@@ -35295,8 +35295,8 @@ void brokerConnect(MQTTClient * client) {
  8012ab0:	e9c0 3303 	strd	r3, r3, [r0, #12]
  8012ab4:	e7f7      	b.n	8012aa6 <_Balloc+0x66>
  8012ab6:	bf00      	nop
- 8012ab8:	080157bf 	.word	0x080157bf
- 8012abc:	080158ec 	.word	0x080158ec
+ 8012ab8:	0801581b 	.word	0x0801581b
+ 8012abc:	08015948 	.word	0x08015948
 
 08012ac0 <_Bfree>:
  8012ac0:	b570      	push	{r4, r5, r6, lr}
@@ -35324,8 +35324,8 @@ void brokerConnect(MQTTClient * client) {
  8012af4:	6021      	str	r1, [r4, #0]
  8012af6:	f843 4022 	str.w	r4, [r3, r2, lsl #2]
  8012afa:	bd70      	pop	{r4, r5, r6, pc}
- 8012afc:	080157bf 	.word	0x080157bf
- 8012b00:	080158ec 	.word	0x080158ec
+ 8012afc:	0801581b 	.word	0x0801581b
+ 8012b00:	08015948 	.word	0x08015948
 
 08012b04 <__multadd>:
  8012b04:	e92d 41f0 	stmdb	sp!, {r4, r5, r6, r7, r8, lr}
@@ -35379,8 +35379,8 @@ void brokerConnect(MQTTClient * client) {
  8012b80:	6125      	str	r5, [r4, #16]
  8012b82:	4620      	mov	r0, r4
  8012b84:	e8bd 81f0 	ldmia.w	sp!, {r4, r5, r6, r7, r8, pc}
- 8012b88:	080158db 	.word	0x080158db
- 8012b8c:	080158ec 	.word	0x080158ec
+ 8012b88:	08015937 	.word	0x08015937
+ 8012b8c:	08015948 	.word	0x08015948
 
 08012b90 <__hi0bits>:
  8012b90:	f5b0 3f80 	cmp.w	r0, #65536	@ 0x10000
@@ -35470,8 +35470,8 @@ void brokerConnect(MQTTClient * client) {
  8012c46:	6103      	str	r3, [r0, #16]
  8012c48:	bd10      	pop	{r4, pc}
  8012c4a:	bf00      	nop
- 8012c4c:	080158db 	.word	0x080158db
- 8012c50:	080158ec 	.word	0x080158ec
+ 8012c4c:	08015937 	.word	0x08015937
+ 8012c50:	08015948 	.word	0x08015948
 
 08012c54 <__multiply>:
  8012c54:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -35590,8 +35590,8 @@ void brokerConnect(MQTTClient * client) {
  8012d9a:	e799      	b.n	8012cd0 <__multiply+0x7c>
  8012d9c:	3e01      	subs	r6, #1
  8012d9e:	e79b      	b.n	8012cd8 <__multiply+0x84>
- 8012da0:	080158db 	.word	0x080158db
- 8012da4:	080158ec 	.word	0x080158ec
+ 8012da0:	08015937 	.word	0x08015937
+ 8012da4:	08015948 	.word	0x08015948
 
 08012da8 <__pow5mult>:
  8012da8:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -35659,9 +35659,9 @@ void brokerConnect(MQTTClient * client) {
  8012e48:	4630      	mov	r0, r6
  8012e4a:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  8012e4e:	bf00      	nop
- 8012e50:	08015948 	.word	0x08015948
- 8012e54:	080157bf 	.word	0x080157bf
- 8012e58:	080158ec 	.word	0x080158ec
+ 8012e50:	080159a4 	.word	0x080159a4
+ 8012e54:	0801581b 	.word	0x0801581b
+ 8012e58:	08015948 	.word	0x08015948
 
 08012e5c <__lshift>:
  8012e5c:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -35740,8 +35740,8 @@ void brokerConnect(MQTTClient * client) {
  8012f26:	d8f9      	bhi.n	8012f1c <__lshift+0xc0>
  8012f28:	e7ea      	b.n	8012f00 <__lshift+0xa4>
  8012f2a:	bf00      	nop
- 8012f2c:	080158db 	.word	0x080158db
- 8012f30:	080158ec 	.word	0x080158ec
+ 8012f2c:	08015937 	.word	0x08015937
+ 8012f30:	08015948 	.word	0x08015948
 
 08012f34 <__mcmp>:
  8012f34:	690a      	ldr	r2, [r1, #16]
@@ -35877,8 +35877,8 @@ void brokerConnect(MQTTClient * client) {
  8013086:	3f01      	subs	r7, #1
  8013088:	e7e7      	b.n	801305a <__mdiff+0xee>
  801308a:	bf00      	nop
- 801308c:	080158db 	.word	0x080158db
- 8013090:	080158ec 	.word	0x080158ec
+ 801308c:	08015937 	.word	0x08015937
+ 8013090:	08015948 	.word	0x08015948
 
 08013094 <__d2b>:
  8013094:	e92d 43f7 	stmdb	sp!, {r0, r1, r2, r4, r5, r6, r7, r8, r9, lr}
@@ -35944,8 +35944,8 @@ void brokerConnect(MQTTClient * client) {
  8013132:	f7ff fd2d 	bl	8012b90 <__hi0bits>
  8013136:	ebc0 1042 	rsb	r0, r0, r2, lsl #5
  801313a:	e7e5      	b.n	8013108 <__d2b+0x74>
- 801313c:	080158db 	.word	0x080158db
- 8013140:	080158ec 	.word	0x080158ec
+ 801313c:	08015937 	.word	0x08015937
+ 8013140:	08015948 	.word	0x08015948
 
 08013144 <_malloc_usable_size_r>:
  8013144:	f851 3c04 	ldr.w	r3, [r1, #-4]
@@ -36044,7 +36044,7 @@ void brokerConnect(MQTTClient * client) {
  8013226:	1e69      	subs	r1, r5, #1
  8013228:	6011      	str	r1, [r2, #0]
  801322a:	e7f5      	b.n	8013218 <_strtoul_l.constprop.0+0xc4>
- 801322c:	0801568d 	.word	0x0801568d
+ 801322c:	080156e9 	.word	0x080156e9
 
 08013230 <_strtoul_r>:
  8013230:	f7ff bf90 	b.w	8013154 <_strtoul_l.constprop.0>
@@ -36337,11 +36337,11 @@ void brokerConnect(MQTTClient * client) {
  80134e0:	4638      	mov	r0, r7
  80134e2:	f7fd fe83 	bl	80111ec <_printf_i>
  80134e6:	e7ed      	b.n	80134c4 <_svfiprintf_r+0x1c0>
- 80134e8:	08015a48 	.word	0x08015a48
- 80134ec:	08015a52 	.word	0x08015a52
+ 80134e8:	08015aa0 	.word	0x08015aa0
+ 80134ec:	08015aaa 	.word	0x08015aaa
  80134f0:	08010cbd 	.word	0x08010cbd
  80134f4:	0801324f 	.word	0x0801324f
- 80134f8:	08015a4e 	.word	0x08015a4e
+ 80134f8:	08015aa6 	.word	0x08015aa6
 
 080134fc <_sungetc_r>:
  80134fc:	b538      	push	{r3, r4, r5, lr}
@@ -36702,8 +36702,8 @@ void brokerConnect(MQTTClient * client) {
  8013852:	bf00      	nop
  8013854:	080134fd 	.word	0x080134fd
  8013858:	08013573 	.word	0x08013573
- 801385c:	0801568d 	.word	0x0801568d
- 8013860:	08015a4e 	.word	0x08015a4e
+ 801385c:	080156e9 	.word	0x080156e9
+ 8013860:	08015aa6 	.word	0x08015aa6
  8013864:	4b0a      	ldr	r3, [pc, #40]	@ (8013890 <__ssvfiscanf_r+0x2e4>)
  8013866:	2b00      	cmp	r3, #0
  8013868:	f43f aec5 	beq.w	80135f6 <__ssvfiscanf_r+0x4a>
@@ -36987,11 +36987,11 @@ void brokerConnect(MQTTClient * client) {
  8013afc:	4630      	mov	r0, r6
  8013afe:	f7fd fb75 	bl	80111ec <_printf_i>
  8013b02:	e7e4      	b.n	8013ace <_vfiprintf_r+0x1e6>
- 8013b04:	08015a48 	.word	0x08015a48
- 8013b08:	08015a52 	.word	0x08015a52
+ 8013b04:	08015aa0 	.word	0x08015aa0
+ 8013b08:	08015aaa 	.word	0x08015aaa
  8013b0c:	08010cbd 	.word	0x08010cbd
  8013b10:	080138c3 	.word	0x080138c3
- 8013b14:	08015a4e 	.word	0x08015a4e
+ 8013b14:	08015aa6 	.word	0x08015aa6
 
 08013b18 <_scanf_chars>:
  8013b18:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -37074,7 +37074,7 @@ void brokerConnect(MQTTClient * client) {
  8013bc0:	2000      	movs	r0, #0
  8013bc2:	e8bd 83f8 	ldmia.w	sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
  8013bc6:	bf00      	nop
- 8013bc8:	0801568d 	.word	0x0801568d
+ 8013bc8:	080156e9 	.word	0x080156e9
 
 08013bcc <_scanf_i>:
  8013bcc:	e92d 4ff0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -37268,10 +37268,10 @@ void brokerConnect(MQTTClient * client) {
  8013d9e:	2001      	movs	r0, #1
  8013da0:	e7f2      	b.n	8013d88 <_scanf_i+0x1bc>
  8013da2:	bf00      	nop
- 8013da4:	08015504 	.word	0x08015504
+ 8013da4:	08015560 	.word	0x08015560
  8013da8:	08010b65 	.word	0x08010b65
  8013dac:	08013231 	.word	0x08013231
- 8013db0:	08015a69 	.word	0x08015a69
+ 8013db0:	08015ac1 	.word	0x08015ac1
 
 08013db4 <__sflush_r>:
  8013db4:	f9b1 200c 	ldrsh.w	r2, [r1, #12]
