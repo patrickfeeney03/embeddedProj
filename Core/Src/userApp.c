@@ -63,10 +63,19 @@ typedef struct {
 #endif
 } device_config_t;
 
+typedef struct {
+    char endpoint[30];
+    char payload[255];
+    size_t payloadlen;
+    enum QoS qos;
+} MyMQTTMessage;
+
 void timersCallback(TimerHandle_t xTimer) {
+	EventBits_t bits = xEventGroupGetBits(timersEventGroupHandler);
+//	printf("Current event group bits: 0x%lx\r\n", bits);
 	if (xTimer == temperatureTimerHandler) {
 //		printf("Temperature timer running\r\n");
-		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
+//		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
 	} else if (xTimer == humidityTimerHandler) {
 //		printf("Humidity timer running\r\n");
 		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
@@ -156,7 +165,7 @@ static void temperatureTask(void * pvParameters) {
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
 //		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
-		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit, pdTRUE, pdFALSE, 0)) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
 			float tempF = BSP_TSENSOR_ReadTemp();
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
@@ -174,25 +183,28 @@ static void temperatureTask(void * pvParameters) {
 }
 
 static void humidityTask(void * pvParameters) {
-	MQTTMessage mqmsg;
+	MyMQTTMessage mqmsg;
 	char humidityStrBuffer[25];
+	char endpoint[30] = "/v1.6/devices/rtos";
 	printf("Starting Humidity Publish Task\r\n");
 	BSP_HSENSOR_Init();
 	while(1) {
 //		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
-		if (xEventGroupWaitBits(timersEventGroupHandler, humidityBit, pdTRUE, pdFALSE, 0)) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, humidityBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
 			float humidityF = BSP_HSENSOR_ReadHumidity();
 			uint16_t humidityI = humidityF*10;
 			sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
-			printf("Publishing Humidity: %sC\r\n", humidityStrBuffer);
-			memset(&mqmsg, 0, sizeof(MQTTMessage));
+//			printf("Publishing Humidity: %sC\r\n", humidityStrBuffer);
+
+			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 			mqmsg.qos = QOS0;
-			mqmsg.payload = (char *) humidityStrBuffer;
+			strcpy(mqmsg.payload, humidityStrBuffer);
 			mqmsg.payloadlen = strlen(humidityStrBuffer);
+			strcpy(mqmsg.endpoint, endpoint);
 
 //			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
-			if (xQueueSend(publishQueue, &mqmsg, 0) == pdPASS) {
-				printf("Data sent to queue\r\n");
+			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
+				printf("Could not send data to queue. Humidity\r\n");
 			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
@@ -200,13 +212,20 @@ static void humidityTask(void * pvParameters) {
 }
 
 static void publishTask(void * pvParameters) {
-	MQTTMessage msgToPublish;
+	MyMQTTMessage msgToPublish;
+	MQTTMessage mqmsg;
 	while (1) {
 		if (xQueueReceive(publishQueue, &msgToPublish, portMAX_DELAY) == pdPASS) {
 			printf("Publishing message: %s\r\n", msgToPublish.payload);
-			MQTTPublish(&client, "/v1.6/devices/rtos", &msgToPublish);
+
+			memset(&mqmsg, 0, sizeof(MQTTMessage));
+			mqmsg.qos = msgToPublish.qos;
+			mqmsg.payload = (char *)msgToPublish.payload;
+			mqmsg.payloadlen = msgToPublish.payloadlen;
+
+			MQTTPublish(&client, msgToPublish.endpoint, &mqmsg);
 		}
-		vTaskDelay(pdMS_TO_TICKS(100));
+		vTaskDelay(pdMS_TO_TICKS(1500));
 	}
 }
 
@@ -227,8 +246,8 @@ static void RTC_Task(void * pvParameters) {
 			timeDisplay = 0;
 			HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 			HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-			sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
-			printf("%s", timeBuffer);
+//			sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
+//			printf("%s", timeBuffer);
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -251,14 +270,14 @@ static void initTask(void * pvParameters) {
 		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 		brokerConnect(&client);	//connect to WiFi access point and then to MQTT broker
 
-		publishSemaphore = xSemaphoreCreateBinary();
-		vQueueAddToRegistry(publishSemaphore, "Publish Semaphore");
+//		publishSemaphore = xSemaphoreCreateBinary();
+//		vQueueAddToRegistry(publishSemaphore, "Publish Semaphore");
 
 		oneSecondSemaphore = xSemaphoreCreateBinary();
 		vQueueAddToRegistry(oneSecondSemaphore, "RTC Semaphore");
 
-		publishHumiditySemaphore = xSemaphoreCreateBinary();
-		vQueueAddToRegistry(publishHumiditySemaphore, "Publish Humidity Semaphore");
+//		publishHumiditySemaphore = xSemaphoreCreateBinary();
+//		vQueueAddToRegistry(publishHumiditySemaphore, "Publish Humidity Semaphore");
 
 		if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
 			printf("Temperature task created\n\r");
@@ -313,17 +332,17 @@ static void initTask(void * pvParameters) {
 			}
 		}
 
-		// Pressure timer creation
-		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timersCallback);
-		if (pressureTimerHandler == NULL) {
-			printf("Pressure timer creation failed.\r\n");
-		} else {
-			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
-				printf("Pressure timer started.\r\n");
-			} else {
-				printf("Humidity timer start failed.\r\n");
-			}
-		}
+//		// Pressure timer creation
+//		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timersCallback);
+//		if (pressureTimerHandler == NULL) {
+//			printf("Pressure timer creation failed.\r\n");
+//		} else {
+//			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
+//				printf("Pressure timer started.\r\n");
+//			} else {
+//				printf("Humidity timer start failed.\r\n");
+//			}
+//		}
 
 		// Timers event groups
 		timersEventGroupHandler = xEventGroupCreate();
@@ -334,7 +353,7 @@ static void initTask(void * pvParameters) {
 		}
 
 		// Queue
-		publishQueue = xQueueCreate(5, sizeof(MQTTMessage));
+		publishQueue = xQueueCreate(5, sizeof(MyMQTTMessage));
 
 		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
