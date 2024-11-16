@@ -39,6 +39,7 @@ static void RTC_Task(void * pvParameters);
 SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL;
 TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, pressureTimerHandler = NULL;
 EventGroupHandle_t timersEventGroupHandler = NULL;
+QueueHandle_t publishQueue = NULL;
 
 uint8_t RTC_TaskRunning = 0;
 
@@ -155,7 +156,7 @@ static void temperatureTask(void * pvParameters) {
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
 //		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
-		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit | humidityBit | pressureBit, pdTRUE, pdFALSE, 0)) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit, pdTRUE, pdFALSE, 0)) {
 			float tempF = BSP_TSENSOR_ReadTemp();
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
@@ -179,7 +180,7 @@ static void humidityTask(void * pvParameters) {
 	BSP_HSENSOR_Init();
 	while(1) {
 //		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
-		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit | humidityBit | pressureBit, pdTRUE, pdFALSE, 0)) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, humidityBit, pdTRUE, pdFALSE, 0)) {
 			float humidityF = BSP_HSENSOR_ReadHumidity();
 			uint16_t humidityI = humidityF*10;
 			sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
@@ -189,7 +190,21 @@ static void humidityTask(void * pvParameters) {
 			mqmsg.payload = (char *) humidityStrBuffer;
 			mqmsg.payloadlen = strlen(humidityStrBuffer);
 
-			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
+//			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
+			if (xQueueSend(publishQueue, &mqmsg, 0) == pdPASS) {
+				printf("Data sent to queue\r\n");
+			}
+		}
+		vTaskDelay(pdMS_TO_TICKS(100));
+	}
+}
+
+static void publishTask(void * pvParameters) {
+	MQTTMessage msgToPublish;
+	while (1) {
+		if (xQueueReceive(publishQueue, &msgToPublish, portMAX_DELAY) == pdPASS) {
+			printf("Publishing message: %s\r\n", msgToPublish.payload);
+			MQTTPublish(&client, "/v1.6/devices/rtos", &msgToPublish);
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -258,6 +273,11 @@ static void initTask(void * pvParameters) {
 			printf("Humidity task created\n\r");
 		} else printf("Could not create Humidity Task\n\r");
 
+		// Publish task
+		if(xTaskCreate(publishTask, "Publish Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+			printf("Publish task created\n\r");
+		} else printf("Could not create Publish Task\n\r");
+
 		//Subscribe to topics here
 		//change the device name and variable name in the function call to match your Ubidots configuration
 		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/switch", QOS0, (subscribeMessageHandler));
@@ -312,6 +332,9 @@ static void initTask(void * pvParameters) {
 		} else {
 			printf("Timers event group created");
 		}
+
+		// Queue
+		publishQueue = xQueueCreate(5, sizeof(MQTTMessage));
 
 		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
