@@ -11,6 +11,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "queue.h"
+#include "timers.h"
 
 
 //Peripheral Handles
@@ -30,7 +31,9 @@ static void initTask(void * pvParameters);
 static void temperatureTask(void * pvParameters);
 static void humidityTask(void * pvParameters);
 static void RTC_Task(void * pvParameters);
+
 SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL;
+TimerHandle_t temperatureTimer = NULL;
 
 uint8_t RTC_TaskRunning = 0;
 
@@ -54,6 +57,9 @@ typedef struct {
 #endif
 } device_config_t;
 
+void temperatureTimerCallback(TimerHandle_t xTimer) {
+	printf("temperature timer running\r\n");
+}
 
 /*--------------------------------------------------------------------
  * EXTI interrupt handler callback function
@@ -245,6 +251,17 @@ static void initTask(void * pvParameters) {
 		else {
 			printf("\n\rSubscribed to topic \n\r");
 			ret = MQTTYield(&client, 500);
+		}
+
+		temperatureTimer = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, temperatureTimerCallback);
+		if (temperatureTimer == NULL) {
+			printf("Timer creation failed.\r\n");
+		} else {
+			if (xTimerStart(temperatureTimer, 0) == pdTRUE) {
+				printf("Temperature timer started\r\n.");
+			} else {
+				printf("Temperature timer start failed\r\n");
+			}
 		}
 
 		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
