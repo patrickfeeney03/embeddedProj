@@ -33,7 +33,7 @@ static void humidityTask(void * pvParameters);
 static void RTC_Task(void * pvParameters);
 
 SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL;
-TimerHandle_t temperatureTimer = NULL;
+TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, pressureTimerHandler = NULL;
 
 uint8_t RTC_TaskRunning = 0;
 
@@ -57,8 +57,14 @@ typedef struct {
 #endif
 } device_config_t;
 
-void temperatureTimerCallback(TimerHandle_t xTimer) {
-	printf("temperature timer running\r\n");
+void timerCallback(TimerHandle_t xTimer) {
+	if (xTimer == temperatureTimerHandler) {
+		printf("Temperature timer running\r\n");
+	} else if (xTimer == humidityTimerHandler) {
+		printf("Humidity timer running\r\n");
+	} else if (xTimer == pressureTimerHandler) {
+		printf("Pressure timer running\r\n");
+	}
 }
 
 /*--------------------------------------------------------------------
@@ -93,9 +99,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 void TIM6_Handler() {
 //	printf("Running TIM6 Handler\r\n");
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
-	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+//	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+//	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
+//	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 /*--------------------------------------------------------------------
@@ -253,14 +259,39 @@ static void initTask(void * pvParameters) {
 			ret = MQTTYield(&client, 500);
 		}
 
-		temperatureTimer = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, temperatureTimerCallback);
-		if (temperatureTimer == NULL) {
-			printf("Timer creation failed.\r\n");
+		// Temperature timer creation
+		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, timerCallback);
+		if (temperatureTimerHandler == NULL) {
+			printf("Temperature timer creation failed.\r\n");
 		} else {
-			if (xTimerStart(temperatureTimer, 0) == pdTRUE) {
-				printf("Temperature timer started\r\n.");
+			if (xTimerStart(temperatureTimerHandler, 0) == pdTRUE) {
+				printf("Temperature timer started.\r\n");
 			} else {
-				printf("Temperature timer start failed\r\n");
+				printf("Temperature timer start failed.\r\n");
+			}
+		}
+
+		// Humidity timer creation
+		humidityTimerHandler = xTimerCreate("Humidity timer", pdMS_TO_TICKS(10000), pdTRUE, NULL, timerCallback);
+		if (humidityTimerHandler == NULL) {
+			printf("Humidity timer creation failed.\r\n");
+		} else {
+			if (xTimerStart(humidityTimerHandler, 0) == pdTRUE) {
+				printf("Humidity timer started.\r\n");
+			} else {
+				printf("Humidity timer start failed.\r\n");
+			}
+		}
+
+		// Pressure timer creation
+		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timerCallback);
+		if (pressureTimerHandler == NULL) {
+			printf("Pressure timer creation failed.\r\n");
+		} else {
+			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
+				printf("Pressure timer started.\r\n");
+			} else {
+				printf("Humidity timer start failed.\r\n");
 			}
 		}
 
