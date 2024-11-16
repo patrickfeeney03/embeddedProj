@@ -12,7 +12,7 @@
 #include "semphr.h"
 #include "queue.h"
 #include "timers.h"
-
+#include "event_groups.h"
 
 //Peripheral Handles
 extern UART_HandleTypeDef huart1;
@@ -32,8 +32,13 @@ static void temperatureTask(void * pvParameters);
 static void humidityTask(void * pvParameters);
 static void RTC_Task(void * pvParameters);
 
+#define temperatureBit (1 << 0)
+#define humidityBit (1 << 1)
+#define pressureBit (1 << 2)
+
 SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL;
 TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, pressureTimerHandler = NULL;
+EventGroupHandle_t timersEventGroupHandler = NULL;
 
 uint8_t RTC_TaskRunning = 0;
 
@@ -57,13 +62,16 @@ typedef struct {
 #endif
 } device_config_t;
 
-void timerCallback(TimerHandle_t xTimer) {
+void timersCallback(TimerHandle_t xTimer) {
 	if (xTimer == temperatureTimerHandler) {
-		printf("Temperature timer running\r\n");
+//		printf("Temperature timer running\r\n");
+		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
 	} else if (xTimer == humidityTimerHandler) {
-		printf("Humidity timer running\r\n");
+//		printf("Humidity timer running\r\n");
+		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
 	} else if (xTimer == pressureTimerHandler) {
-		printf("Pressure timer running\r\n");
+//		printf("Pressure timer running\r\n");
+//		xEventGroupSetBits(timersEventGroupHandler, pressureBit);
 	}
 }
 
@@ -146,7 +154,8 @@ static void temperatureTask(void * pvParameters) {
 	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
-		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
+//		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit | humidityBit | pressureBit, pdTRUE, pdFALSE, 0)) {
 			float tempF = BSP_TSENSOR_ReadTemp();
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
@@ -169,7 +178,8 @@ static void humidityTask(void * pvParameters) {
 	printf("Starting Humidity Publish Task\r\n");
 	BSP_HSENSOR_Init();
 	while(1) {
-		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
+//		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit | humidityBit | pressureBit, pdTRUE, pdFALSE, 0)) {
 			float humidityF = BSP_HSENSOR_ReadHumidity();
 			uint16_t humidityI = humidityF*10;
 			sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
@@ -260,7 +270,7 @@ static void initTask(void * pvParameters) {
 		}
 
 		// Temperature timer creation
-		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, timerCallback);
+		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, timersCallback);
 		if (temperatureTimerHandler == NULL) {
 			printf("Temperature timer creation failed.\r\n");
 		} else {
@@ -272,7 +282,7 @@ static void initTask(void * pvParameters) {
 		}
 
 		// Humidity timer creation
-		humidityTimerHandler = xTimerCreate("Humidity timer", pdMS_TO_TICKS(10000), pdTRUE, NULL, timerCallback);
+		humidityTimerHandler = xTimerCreate("Humidity timer", pdMS_TO_TICKS(10000), pdTRUE, NULL, timersCallback);
 		if (humidityTimerHandler == NULL) {
 			printf("Humidity timer creation failed.\r\n");
 		} else {
@@ -284,7 +294,7 @@ static void initTask(void * pvParameters) {
 		}
 
 		// Pressure timer creation
-		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timerCallback);
+		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timersCallback);
 		if (pressureTimerHandler == NULL) {
 			printf("Pressure timer creation failed.\r\n");
 		} else {
@@ -293,6 +303,14 @@ static void initTask(void * pvParameters) {
 			} else {
 				printf("Humidity timer start failed.\r\n");
 			}
+		}
+
+		// Timers event groups
+		timersEventGroupHandler = xEventGroupCreate();
+		if (timersEventGroupHandler == NULL) {
+			printf("Timers event group handler creation failed\r\n");
+		} else {
+			printf("Timers event group created");
 		}
 
 		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
