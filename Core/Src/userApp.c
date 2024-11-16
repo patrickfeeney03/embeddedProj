@@ -270,7 +270,7 @@ static void initTask(void * pvParameters) {
 		}
 
 		// Temperature timer creation
-		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(3000), pdTRUE, NULL, timersCallback);
+		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(7000), pdTRUE, NULL, timersCallback);
 		if (temperatureTimerHandler == NULL) {
 			printf("Temperature timer creation failed.\r\n");
 		} else {
