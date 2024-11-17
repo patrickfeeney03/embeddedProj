@@ -41,7 +41,7 @@ TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, press
 EventGroupHandle_t timersEventGroupHandler = NULL;
 QueueHandle_t publishQueue = NULL;
 
-uint8_t RTC_TaskRunning = 0;
+uint8_t RTC_TaskRunning = 0, queueSize;
 
 uint8_t timeDisplay = 0, readSensor = 0;
 net_hnd_t hnet;
@@ -188,7 +188,7 @@ static void temperatureTask(void * pvParameters) {
 			//			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
 			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 				printf("Could not send data to queue. Temperature\r\n");
-			}
+			} else queueSize++;
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -217,7 +217,7 @@ static void humidityTask(void * pvParameters) {
 //			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
 			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 				printf("Could not send data to queue. Humidity\r\n");
-			}
+			} else queueSize++;
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -243,7 +243,7 @@ static void pressureTask(void * pvParameters) {
 
 			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 				printf("Could not send data to queue. Pressure\r\n");
-			}
+			} else queueSize++;
 		}
 	}
 
@@ -254,7 +254,7 @@ static void publishTask(void * pvParameters) {
 	MQTTMessage mqmsg;
 	while (1) {
 		if (xQueueReceive(publishQueue, &msgToPublish, portMAX_DELAY) == pdPASS) {
-			printf("Publishing message: %s\r\n", msgToPublish.payload);
+			printf("Publishing message: %s. Current queue size: %d\r\n", msgToPublish.payload, queueSize);
 
 			memset(&mqmsg, 0, sizeof(MQTTMessage));
 			mqmsg.qos = msgToPublish.qos;
@@ -262,6 +262,7 @@ static void publishTask(void * pvParameters) {
 			mqmsg.payloadlen = msgToPublish.payloadlen;
 
 			MQTTPublish(&client, msgToPublish.endpoint, &mqmsg);
+			queueSize--;
 		}
 		vTaskDelay(pdMS_TO_TICKS(1500));
 	}
