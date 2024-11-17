@@ -81,7 +81,7 @@ void timersCallback(TimerHandle_t xTimer) {
 		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
 	} else if (xTimer == pressureTimerHandler) {
 //		printf("Pressure timer running\r\n");
-//		xEventGroupSetBits(timersEventGroupHandler, pressureBit);
+		xEventGroupSetBits(timersEventGroupHandler, pressureBit);
 	}
 }
 
@@ -223,6 +223,32 @@ static void humidityTask(void * pvParameters) {
 	}
 }
 
+static void pressureTask(void * pvParameters) {
+	MyMQTTMessage mqmsg;
+	char pressureStrBuffer[25];
+	char endpoint[30] = "/v1.6/devices/rtos";
+	printf("Starting Pressure Sensor Task\r\n");
+	BSP_PSENSOR_Init();
+	while(1) {
+		if (xEventGroupWaitBits(timersEventGroupHandler, pressureBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
+			float pressureF = BSP_PSENSOR_ReadPressure();
+			uint16_t pressureI = pressureF*10;
+			sprintf(pressureStrBuffer, "{\"pressure\":%d.%d}", pressureI/10, pressureI%10);
+
+			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
+			mqmsg.qos = QOS0;
+			strcpy(mqmsg.payload, pressureStrBuffer);
+			mqmsg.payloadlen = strlen(pressureStrBuffer);
+			strcpy(mqmsg.endpoint, endpoint);
+
+			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
+				printf("Could not send data to queue. Pressure\r\n");
+			}
+		}
+	}
+
+}
+
 static void publishTask(void * pvParameters) {
 	MyMQTTMessage msgToPublish;
 	MQTTMessage mqmsg;
@@ -248,6 +274,7 @@ static void RTC_Task(void * pvParameters) {
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
 	char timeBuffer[40];
+	uint32_t count = 0;
 
 	RTC_TaskRunning = 1;	//flag set to allow RTC event interrupt handler callback to send semaphores
 
@@ -255,11 +282,14 @@ static void RTC_Task(void * pvParameters) {
 		MQTTYield(&client, 200);	//Yield needed to allow check for received published messages from subscribed topics
 
 		if(xSemaphoreTake(oneSecondSemaphore, 0) == pdTRUE) {
-			timeDisplay = 0;
-			HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-			HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-			sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
-			printf("%s", timeBuffer);
+			count++;
+			if (count % 5 == 0) { // print every 5 seconds
+				timeDisplay = 0;
+				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
+				printf("%s", timeBuffer);
+			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -304,6 +334,11 @@ static void initTask(void * pvParameters) {
 			printf("Humidity task created\n\r");
 		} else printf("Could not create Humidity Task\n\r");
 
+		// Pressure
+		if(xTaskCreate(pressureTask, "Pressure Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+			printf("Pressure task created\r\n");
+		} else printf("Could not create Pressure Task\r\n");
+
 		// Publish task
 		if(xTaskCreate(publishTask, "Publish Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
 			printf("Publish task created\n\r");
@@ -344,17 +379,17 @@ static void initTask(void * pvParameters) {
 			}
 		}
 
-//		// Pressure timer creation
-//		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(1000), pdTRUE, NULL, timersCallback);
-//		if (pressureTimerHandler == NULL) {
-//			printf("Pressure timer creation failed.\r\n");
-//		} else {
-//			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
-//				printf("Pressure timer started.\r\n");
-//			} else {
-//				printf("Humidity timer start failed.\r\n");
-//			}
-//		}
+		// Pressure timer creation
+		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(20000), pdTRUE, NULL, timersCallback);
+		if (pressureTimerHandler == NULL) {
+			printf("Pressure timer creation failed.\r\n");
+		} else {
+			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
+				printf("Pressure timer started.\r\n");
+			} else {
+				printf("Humidity timer start failed.\r\n");
+			}
+		}
 
 		// Timers event groups
 		timersEventGroupHandler = xEventGroupCreate();
