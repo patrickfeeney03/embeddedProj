@@ -159,6 +159,14 @@ void subscribeMessageHandler(MessageData* data)
 //			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 //		}
 //	}
+
+	if (strstr(mqtt_topic, "rtos/tempcontrol")) {
+		if (strstr(mqtt_msg, "1.0")) {
+			xTimerStart(temperatureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
+		} else {
+			xTimerStop(temperatureTimerHandler, pdMS_TO_TICKS(100));
+		}
+	}
 }
 
 static void temperatureTask(void * pvParameters) {
@@ -241,7 +249,7 @@ static void publishTask(void * pvParameters) {
 	MQTTMessage mqmsg;
 	printf("Starting publish task\r\n");
 	while (1) {
-		if (xQueueReceive(publishQueue, &msgToPublish, portMAX_DELAY) == pdPASS) {
+		if (xQueueReceive(publishQueue, &msgToPublish, 0) == pdPASS) {
 			printf("Publishing message: %s. Current queue size: %d\r\n", msgToPublish.payload, queueSize);
 
 			memset(&mqmsg, 0, sizeof(MQTTMessage));
@@ -264,7 +272,7 @@ static void publishTask(void * pvParameters) {
 static void RTC_Task(void * pvParameters) {
 	RTC_TimeTypeDef sTime;
 	RTC_DateTypeDef sDate;
-	char timeBuffer[40];
+//	char timeBuffer[40];
 	uint32_t count = 0;
 
 	RTC_TaskRunning = 1;	//flag set to allow RTC event interrupt handler callback to send semaphores
@@ -312,21 +320,29 @@ static void initTask(void * pvParameters) {
 //		publishHumiditySemaphore = xSemaphoreCreateBinary();
 //		vQueueAddToRegistry(publishHumiditySemaphore, "Publish Humidity Semaphore");
 
-		if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+		// Timers event groups
+		timersEventGroupHandler = xEventGroupCreate();
+		if (timersEventGroupHandler == NULL) {
+			printf("Timers event group handler creation failed\r\n");
+		} else {
+			printf("Timers event group created");
+		}
+
+		// Queue
+		publishQueue = xQueueCreate(5, sizeof(MyMQTTMessage));
+
+		// Temperature task
+		if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
 			printf("Temperature task created\n\r");
 		} else printf("Could not create temperature task\n\r");
 
-		if(xTaskCreate(RTC_Task, "RTC Task", 500, NULL, configMAX_PRIORITIES - 2, NULL) == pdTRUE) {
-			printf("RTC task created\n\r");
-		} else printf("Could not create RTC task\n\r");
-
-		// Humidity
-		if(xTaskCreate(humidityTask, "Humidity Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+		// Humidity task
+		if(xTaskCreate(humidityTask, "Humidity Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
 			printf("Humidity task created\n\r");
 		} else printf("Could not create Humidity Task\n\r");
 
-		// Pressure
-		if(xTaskCreate(pressureTask, "Pressure Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
+		// Pressure task
+		if(xTaskCreate(pressureTask, "Pressure Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
 			printf("Pressure task created\r\n");
 		} else printf("Could not create Pressure Task\r\n");
 
@@ -335,16 +351,9 @@ static void initTask(void * pvParameters) {
 			printf("Publish task created\n\r");
 		} else printf("Could not create Publish Task\n\r");
 
-		//Subscribe to topics here
-		//change the device name and variable name in the function call to match your Ubidots configuration
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS1, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe failed: %ld\n\r", ret);
-		}
-		else {
-			printf("\n\rSubscribed to topic \n\r");
-			ret = MQTTYield(&client, 500);
-		}
+		if(xTaskCreate(RTC_Task, "RTC Task", 500, NULL, configMAX_PRIORITIES - 2, NULL) == pdTRUE) {
+			printf("RTC task created\n\r");
+		} else printf("Could not create RTC task\n\r");
 
 		// Temperature timer creation
 		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(7000), pdTRUE, NULL, timersCallback);
@@ -382,16 +391,18 @@ static void initTask(void * pvParameters) {
 			}
 		}
 
-		// Timers event groups
-		timersEventGroupHandler = xEventGroupCreate();
-		if (timersEventGroupHandler == NULL) {
-			printf("Timers event group handler creation failed\r\n");
-		} else {
-			printf("Timers event group created");
+		//Subscribe to topics here
+		//change the device name and variable name in the function call to match your Ubidots configuration
+		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS1, (subscribeMessageHandler));
+		if (ret != MQSUCCESS) {
+			printf("\n\rSubscribe failed: %ld\n\r", ret);
+		}
+		else {
+			printf("\n\rSubscribed to topic \n\r");
+			ret = MQTTYield(&client, 500);
 		}
 
-		// Queue
-		publishQueue = xQueueCreate(5, sizeof(MyMQTTMessage));
+
 
 //		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 //		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
@@ -409,7 +420,7 @@ static void initTask(void * pvParameters) {
 void userApp() {
 	printf("Starting user application\r\n\n");
 
-	xTaskCreate(initTask, "Init Task", 800, NULL, configMAX_PRIORITIES - 1, NULL);
+	xTaskCreate(initTask, "Init Task", 1000, NULL, configMAX_PRIORITIES - 1, NULL);
 	vTaskStartScheduler();
 
 	while(1) {
