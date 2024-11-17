@@ -150,21 +150,21 @@ void subscribeMessageHandler(MessageData* data)
 	printf("\r\nPublished message from MQTT broker\r\n");
 	printf("Topic: %s, Payload: %s\r\n\n", mqtt_topic, mqtt_msg);
 
-//	//Change the string parsing to match your Ubidots settings
-//	if(strstr(mqtt_topic, "rtos/tempcontrol")) {	//check topic
-//		if(strstr(mqtt_msg, "\"value\": 1.0")) {	//check data published from topic
-//			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-//		}
-//		else {
-//			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-//		}
-//	}
-
 	if (strstr(mqtt_topic, "rtos/tempcontrol")) {
 		if (strstr(mqtt_msg, "1.0")) {
+			printf("Turning Temperature Timer Back On\r\n");
 			xTimerStart(temperatureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
 		} else {
+			printf("Turning Temperature Timer Off\r\n");
 			xTimerStop(temperatureTimerHandler, pdMS_TO_TICKS(100));
+		}
+	} else if (strstr(mqtt_topic, "rtos/presscontrol")) {
+		if (strstr(mqtt_msg, "1.0")) {
+			printf("Turning Pressure Timer Back On\r\n");
+			xTimerStart(pressureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
+		} else {
+			printf("Turning Pressure Timer Off\r\n");
+			xTimerStop(pressureTimerHandler, pdMS_TO_TICKS(100));
 		}
 	}
 }
@@ -395,12 +395,25 @@ static void initTask(void * pvParameters) {
 		//change the device name and variable name in the function call to match your Ubidots configuration
 		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS1, (subscribeMessageHandler));
 		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe failed: %ld\n\r", ret);
+			printf("\n\rSubscribe to Temperature failed: %ld\n\r", ret);
 		}
 		else {
-			printf("\n\rSubscribed to topic \n\r");
+			printf("\n\rSubscribed to Temperature topic \n\r");
 			ret = MQTTYield(&client, 500);
 		}
+
+		//Subscribe to topics here
+		//change the device name and variable name in the function call to match your Ubidots configuration
+		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presscontrol/lv", QOS1, (subscribeMessageHandler));
+		if (ret != MQSUCCESS) {
+			printf("\n\rSubscribe to Pressure failed: %ld\n\r", ret);
+		}
+		else {
+			printf("\n\rSubscribed to Pressure topic \n\r");
+			ret = MQTTYield(&client, 500);
+		}
+
+
 
 
 
