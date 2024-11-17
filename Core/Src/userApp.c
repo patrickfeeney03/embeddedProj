@@ -161,10 +161,18 @@ void subscribeMessageHandler(MessageData* data)
 	} else if (strstr(mqtt_topic, "rtos/presscontrol")) {
 		if (strstr(mqtt_msg, "1.0")) {
 			printf("Turning Pressure Timer Back On\r\n");
-			xTimerStart(pressureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
+			xTimerStart(pressureTimerHandler, pdMS_TO_TICKS(100));
 		} else {
 			printf("Turning Pressure Timer Off\r\n");
 			xTimerStop(pressureTimerHandler, pdMS_TO_TICKS(100));
+		}
+	} else if (strstr(mqtt_topic, "rtos/humidcontrol")) {
+		if (strstr(mqtt_msg, "1.0")) {
+			printf("Turning Humidity Timer Back On\r\n");
+			xTimerStart(humidityTimerHandler, pdMS_TO_TICKS(100));
+		} else {
+			printf("Turning Humidity Timer Off\r\n");
+			xTimerStop(humidityTimerHandler, pdMS_TO_TICKS(100));
 		}
 	}
 }
@@ -311,14 +319,8 @@ static void initTask(void * pvParameters) {
 		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 		brokerConnect(&client);	//connect to WiFi access point and then to MQTT broker
 
-//		publishSemaphore = xSemaphoreCreateBinary();
-//		vQueueAddToRegistry(publishSemaphore, "Publish Semaphore");
-
 		oneSecondSemaphore = xSemaphoreCreateBinary();
 		vQueueAddToRegistry(oneSecondSemaphore, "RTC Semaphore");
-
-//		publishHumiditySemaphore = xSemaphoreCreateBinary();
-//		vQueueAddToRegistry(publishHumiditySemaphore, "Publish Humidity Semaphore");
 
 		// Timers event groups
 		timersEventGroupHandler = xEventGroupCreate();
@@ -399,7 +401,6 @@ static void initTask(void * pvParameters) {
 		}
 		else {
 			printf("\n\rSubscribed to Temperature topic \n\r");
-			ret = MQTTYield(&client, 500);
 		}
 
 		//Subscribe to topics here
@@ -410,12 +411,20 @@ static void initTask(void * pvParameters) {
 		}
 		else {
 			printf("\n\rSubscribed to Pressure topic \n\r");
-			ret = MQTTYield(&client, 500);
 		}
 
+		//Subscribe to topics here
+		//change the device name and variable name in the function call to match your Ubidots configuration
+		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/humidcontrol/lv", QOS1, (subscribeMessageHandler));
+		if (ret != MQSUCCESS) {
+			printf("\n\rSubscribe to Humidity failed: %ld\n\r", ret);
+		}
+		else {
+			printf("\n\rSubscribed to Humidity topic \n\r");
+		}
 
-
-
+		// Get current value for all variables
+		ret = MQTTYield(&client, 500);
 
 //		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 //		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
