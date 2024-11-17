@@ -116,10 +116,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 }
 
 void TIM6_Handler() {
+
 //	printf("Running TIM6 Handler\r\n");
 //	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 //	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
+//	xTaskNotifyFromISR(toggleLedHandler, (uint32_t) 1, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
 //	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+
 }
 
 /*--------------------------------------------------------------------
@@ -171,13 +174,6 @@ static void temperatureTask(void * pvParameters) {
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
 //			printf("Publishing Temperature: %sC\r\n", temperature);
-
-//			memset(&mqmsg, 0, sizeof(MQTTMessage));
-//			mqmsg.qos = QOS0;
-//			strcpy(mqmsg.payload, temperature);
-////			mqmsg.payload = (char *) temperature;
-//			mqmsg.payloadlen = strlen(temperature);
-//			strcpy(mqmsg.endpoint, endpoint);
 
 			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 			mqmsg.qos = QOS0;
@@ -252,6 +248,7 @@ static void pressureTask(void * pvParameters) {
 static void publishTask(void * pvParameters) {
 	MyMQTTMessage msgToPublish;
 	MQTTMessage mqmsg;
+	printf("Starting publish task\r\n");
 	while (1) {
 		if (xQueueReceive(publishQueue, &msgToPublish, portMAX_DELAY) == pdPASS) {
 			printf("Publishing message: %s. Current queue size: %d\r\n", msgToPublish.payload, queueSize);
@@ -261,7 +258,9 @@ static void publishTask(void * pvParameters) {
 			mqmsg.payload = (char *)msgToPublish.payload;
 			mqmsg.payloadlen = msgToPublish.payloadlen;
 
+			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 1);
 			MQTTPublish(&client, msgToPublish.endpoint, &mqmsg);
+			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, 0);
 			queueSize--;
 		}
 		vTaskDelay(pdMS_TO_TICKS(1500));
@@ -284,13 +283,13 @@ static void RTC_Task(void * pvParameters) {
 
 		if(xSemaphoreTake(oneSecondSemaphore, 0) == pdTRUE) {
 			count++;
-			if (count % 5 == 0) { // print every 5 seconds
-				timeDisplay = 0;
-				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
-				printf("%s", timeBuffer);
-			}
+//			if (count % 5 == 0) { // print every 5 seconds
+//				timeDisplay = 0;
+//				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+//				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+//				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
+//				printf("%s", timeBuffer);
+//			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -403,9 +402,9 @@ static void initTask(void * pvParameters) {
 		// Queue
 		publishQueue = xQueueCreate(5, sizeof(MyMQTTMessage));
 
-		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
-		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
-		HAL_TIM_Base_Start_IT(&htim6);
+//		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
+//		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
+//		HAL_TIM_Base_Start_IT(&htim6);
 
 		printf("Deleting Init Task\r\n\n");
 		vTaskDelete(NULL);
