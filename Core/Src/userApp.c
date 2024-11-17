@@ -150,15 +150,15 @@ void subscribeMessageHandler(MessageData* data)
 	printf("\r\nPublished message from MQTT broker\r\n");
 	printf("Topic: %s, Payload: %s\r\n\n", mqtt_topic, mqtt_msg);
 
-	//Change the string parsing to match your Ubidots settings
-	if(strstr(mqtt_topic, "rtos/switch")) {	//check topic
-		if(strstr(mqtt_msg, "\"value\": 1.0")) {	//check data published from topic
-			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
-		}
-		else {
-			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
-		}
-	}
+//	//Change the string parsing to match your Ubidots settings
+//	if(strstr(mqtt_topic, "rtos/tempcontrol")) {	//check topic
+//		if(strstr(mqtt_msg, "\"value\": 1.0")) {	//check data published from topic
+//			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_SET);
+//		}
+//		else {
+//			HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
+//		}
+//	}
 }
 
 static void temperatureTask(void * pvParameters) {
@@ -168,12 +168,10 @@ static void temperatureTask(void * pvParameters) {
 	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
-//		if(xSemaphoreTake(publishSemaphore, 0) == pdTRUE) {
 		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
 			float tempF = BSP_TSENSOR_ReadTemp();
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
-//			printf("Publishing Temperature: %sC\r\n", temperature);
 
 			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 			mqmsg.qos = QOS0;
@@ -181,12 +179,10 @@ static void temperatureTask(void * pvParameters) {
 			mqmsg.payloadlen = strlen(temperature);
 			strcpy(mqmsg.endpoint, endpoint);
 
-			//			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
 			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 				printf("Could not send data to queue. Temperature\r\n");
 			} else queueSize++;
 		}
-		vTaskDelay(pdMS_TO_TICKS(100));
 	}
 }
 
@@ -197,12 +193,10 @@ static void humidityTask(void * pvParameters) {
 	printf("Starting Humidity Publish Task\r\n");
 	BSP_HSENSOR_Init();
 	while(1) {
-//		if (xSemaphoreTake(publishHumiditySemaphore, 0) == pdTRUE) {
 		if (xEventGroupWaitBits(timersEventGroupHandler, humidityBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
 			float humidityF = BSP_HSENSOR_ReadHumidity();
 			uint16_t humidityI = humidityF*10;
 			sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
-//			printf("Publishing Humidity: %sC\r\n", humidityStrBuffer);
 
 			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 			mqmsg.qos = QOS0;
@@ -210,12 +204,10 @@ static void humidityTask(void * pvParameters) {
 			mqmsg.payloadlen = strlen(humidityStrBuffer);
 			strcpy(mqmsg.endpoint, endpoint);
 
-//			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
 			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 				printf("Could not send data to queue. Humidity\r\n");
 			} else queueSize++;
 		}
-		vTaskDelay(pdMS_TO_TICKS(100));
 	}
 }
 
@@ -242,7 +234,6 @@ static void pressureTask(void * pvParameters) {
 			} else queueSize++;
 		}
 	}
-
 }
 
 static void publishTask(void * pvParameters) {
@@ -281,17 +272,17 @@ static void RTC_Task(void * pvParameters) {
 	while(1) {
 		MQTTYield(&client, 200);	//Yield needed to allow check for received published messages from subscribed topics
 
-		if(xSemaphoreTake(oneSecondSemaphore, 0) == pdTRUE) {
+//		if(xSemaphoreTake(oneSecondSemaphore, 0) == pdTRUE) {
 			count++;
 //			if (count % 5 == 0) { // print every 5 seconds
-//				timeDisplay = 0;
-//				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-//				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+				timeDisplay = 0;
+				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
 //				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
 //				printf("%s", timeBuffer);
 //			}
-		}
-		vTaskDelay(pdMS_TO_TICKS(100));
+//		}
+		vTaskDelay(pdMS_TO_TICKS(200));
 	}
 }
 
@@ -346,7 +337,7 @@ static void initTask(void * pvParameters) {
 
 		//Subscribe to topics here
 		//change the device name and variable name in the function call to match your Ubidots configuration
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/switch", QOS0, (subscribeMessageHandler));
+		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS1, (subscribeMessageHandler));
 		if (ret != MQSUCCESS) {
 			printf("\n\rSubscribe failed: %ld\n\r", ret);
 		}
