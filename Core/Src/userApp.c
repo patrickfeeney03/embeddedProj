@@ -71,11 +71,11 @@ typedef struct {
 } MyMQTTMessage;
 
 void timersCallback(TimerHandle_t xTimer) {
-	EventBits_t bits = xEventGroupGetBits(timersEventGroupHandler);
+//	EventBits_t bits = xEventGroupGetBits(timersEventGroupHandler);
 //	printf("Current event group bits: 0x%lx\r\n", bits);
 	if (xTimer == temperatureTimerHandler) {
 //		printf("Temperature timer running\r\n");
-//		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
+		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
 	} else if (xTimer == humidityTimerHandler) {
 //		printf("Humidity timer running\r\n");
 		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
@@ -159,8 +159,9 @@ void subscribeMessageHandler(MessageData* data)
 }
 
 static void temperatureTask(void * pvParameters) {
-	MQTTMessage mqmsg;
+	MyMQTTMessage mqmsg;
 	char temperature[25];
+	char endpoint[30] = "/v1.6/devices/rtos";
 	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
@@ -169,14 +170,25 @@ static void temperatureTask(void * pvParameters) {
 			float tempF = BSP_TSENSOR_ReadTemp();
 			uint16_t tempI = tempF*10;
 			sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
-			printf("Publishing Temperature: %sC\r\n", temperature);
-			memset(&mqmsg, 0, sizeof(MQTTMessage));
-			mqmsg.qos = QOS0;
-			mqmsg.payload = (char *) temperature;
-			mqmsg.payloadlen = strlen(temperature);
+//			printf("Publishing Temperature: %sC\r\n", temperature);
 
-			//change the device api label to match your Ubidots configuration
-			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
+//			memset(&mqmsg, 0, sizeof(MQTTMessage));
+//			mqmsg.qos = QOS0;
+//			strcpy(mqmsg.payload, temperature);
+////			mqmsg.payload = (char *) temperature;
+//			mqmsg.payloadlen = strlen(temperature);
+//			strcpy(mqmsg.endpoint, endpoint);
+
+			memset(&mqmsg, 0, sizeof(MyMQTTMessage));
+			mqmsg.qos = QOS0;
+			strcpy(mqmsg.payload, temperature);
+			mqmsg.payloadlen = strlen(temperature);
+			strcpy(mqmsg.endpoint, endpoint);
+
+			//			MQTTPublish(&client, "/v1.6/devices/rtos", &mqmsg);
+			if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
+				printf("Could not send data to queue. Temperature\r\n");
+			}
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
@@ -246,8 +258,8 @@ static void RTC_Task(void * pvParameters) {
 			timeDisplay = 0;
 			HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 			HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-//			sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
-//			printf("%s", timeBuffer);
+			sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
+			printf("%s", timeBuffer);
 		}
 		vTaskDelay(pdMS_TO_TICKS(100));
 	}
