@@ -40,6 +40,7 @@ SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHum
 TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, pressureTimerHandler = NULL;
 EventGroupHandle_t timersEventGroupHandler = NULL;
 QueueHandle_t publishQueue = NULL;
+//IWDG_HandleTypeDef hiwdg;
 
 uint8_t RTC_TaskRunning = 0, queueSize = 0;
 
@@ -319,6 +320,7 @@ static void RTC_Task(void * pvParameters) {
 				timeDisplay = 0;
 				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
 				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+				if (client.isconnected) HAL_IWDG_Refresh(&hiwdg);
 //				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
 //				printf("%s", timeBuffer);
 //			}
@@ -534,7 +536,9 @@ void brokerConnect(MQTTClient * client) {
 	else {
 		printf("\n\rOK");
 	}
+	HAL_IWDG_Refresh(&hiwdg);
 	HAL_Delay(500);
+	HAL_IWDG_Refresh(&hiwdg);
 
 	printf("\n\rRetrieving the IP address.");
 
@@ -552,6 +556,7 @@ void brokerConnect(MQTTClient * client) {
 				printf("\n\rError 3");
 		}
 	}
+	HAL_IWDG_Refresh(&hiwdg);
 
 	if (net_get_mac_address(hnet, &macAddr) == NET_OK) {
 		printf("\n\rMac Address: %02x:%02x:%02x:%02x:%02x:%02x\r\n",
@@ -569,6 +574,7 @@ void brokerConnect(MQTTClient * client) {
 		//RTC started with a 1-second wake-up interrupt
 		HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, 2047, RTC_WAKEUPCLOCK_RTCCLK_DIV16);
 	}
+	HAL_IWDG_Refresh(&hiwdg);
 
 	printf("Connecting to MQTT Broker Server\r\n\n");
 	//Create network socket
@@ -583,6 +589,7 @@ void brokerConnect(MQTTClient * client) {
 	{
 		ret |= net_sock_setopt(socket, "sock_noblocking", NULL, 0);
 	}
+	HAL_IWDG_Refresh(&hiwdg);
 
 	ret = net_sock_open(socket, MQTT_Config.HostName, 1883, 0);
 	if (ret != NET_OK)
@@ -594,6 +601,7 @@ void brokerConnect(MQTTClient * client) {
 		printf("\r\nConnected to MQTT Broker Server\r\n");
 		HAL_Delay(1000);
 	}
+	HAL_IWDG_Refresh(&hiwdg);
 
 	network.my_socket = socket;
 	network.mqttread = (network_rd);
@@ -601,6 +609,7 @@ void brokerConnect(MQTTClient * client) {
 
 	MQTTClientInit(client, &network, MQTT_CMD_TIMEOUT, mqtt_send_buffer, MQTT_SEND_BUFFER_SIZE,
 			mqtt_read_buffer, MQTT_READ_BUFFER_SIZE);
+	HAL_IWDG_Refresh(&hiwdg);
 
 	/* MQTT connect */
 	options.clientID.cstring = MQTT_Config.MQClientId;
@@ -623,5 +632,5 @@ void brokerConnect(MQTTClient * client) {
 		HAL_Delay(1000);
 	}
 	HAL_Delay(1000);
-
+	HAL_IWDG_Refresh(&hiwdg);
 }

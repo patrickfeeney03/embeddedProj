@@ -85,11 +85,12 @@ uint8_t Button_WaitForMultiPush(uint32_t timeout);
 void    Led_SetState(bool on);
 void    Led_Blink(int period, int duty, int count);
 void    Periph_Config(void);
-void SPI3_IRQHandler(void);
+void 	SPI3_IRQHandler(void);
 extern  SPI_HandleTypeDef hspi;
 extern RNG_HandleTypeDef hrng;
 extern RTC_HandleTypeDef hrtc;
 extern net_hnd_t         hnet;
+extern IWDG_HandleTypeDef hiwdg;
 
 extern const user_config_t *lUserConfigPtr;
 /* USER CODE END EFP */

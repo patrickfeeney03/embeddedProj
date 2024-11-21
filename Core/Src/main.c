@@ -86,6 +86,8 @@ DFSDM_Channel_HandleTypeDef hdfsdm1_channel1;
 
 I2C_HandleTypeDef hi2c2;
 
+IWDG_HandleTypeDef hiwdg;
+
 QSPI_HandleTypeDef hqspi;
 
 RNG_HandleTypeDef hrng;
@@ -122,6 +124,7 @@ static void MX_TIM7_Init(void);
 static void MX_RNG_Init(void);
 static void MX_RTC_Init(void);
 static void MX_TIM6_Init(void);
+static void MX_IWDG_Init(void);
 void StartDefaultTask(void const * argument);
 
 /* USER CODE BEGIN PFP */
@@ -200,9 +203,12 @@ int main(void)
   MX_RNG_Init();
   MX_RTC_Init();
   MX_TIM6_Init();
+  MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   printf("IoT Project\r\n\n");
   userApp();
+
+
 
   /* USER CODE END 2 */
 
@@ -419,6 +425,35 @@ static void MX_I2C2_Init(void)
   /* USER CODE BEGIN I2C2_Init 2 */
 
   /* USER CODE END I2C2_Init 2 */
+
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_64;
+  hiwdg.Init.Window = 4095;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 
 }
 
