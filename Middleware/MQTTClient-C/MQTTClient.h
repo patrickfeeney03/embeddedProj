@@ -51,7 +51,7 @@
 #define MAX_PACKET_ID 65535 /* according to the MQTT specification - do not change! */
 
 #if !defined(MAX_MESSAGE_HANDLERS)
-#define MAX_MESSAGE_HANDLERS 5 /* redefinable - how many subscriptions do you want? */
+#define MAX_MESSAGE_HANDLERS 6 /* redefinable - how many subscriptions do you want? */
 #endif
 
 enum QoS { QOS0, QOS1, QOS2, SUBFAIL=0x80 };
