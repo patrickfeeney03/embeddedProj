@@ -42,7 +42,7 @@ EventGroupHandle_t timersEventGroupHandler = NULL;
 QueueHandle_t publishQueue = NULL;
 //IWDG_HandleTypeDef hiwdg;
 
-uint8_t RTC_TaskRunning = 0, queueSize = 0;
+uint8_t RTC_TaskRunning = 0, queueSize = 0, ch;
 
 uint8_t timeDisplay = 0, readSensor = 0;
 net_hnd_t hnet;
@@ -114,6 +114,27 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		break;
 	}
 	}
+}
+
+void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart) {
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+	char endpoint[] = "/v1.6/devices/rtos";
+	char payload[] = "{\"temptime\": 4000, \"presstime\": 4000, \"humidtime\": 4000}";
+	MyMQTTMessage myMQTTMessage;
+	myMQTTMessage.qos = QOS0;
+	strcpy(myMQTTMessage.payload, payload);
+	strcpy(myMQTTMessage.endpoint, endpoint);
+	myMQTTMessage.payloadlen = strlen(payload);
+
+	if (ch == 'r') {
+		printf("Received character R");
+		// reset timers back to 4 and send that to Ubidots...
+
+		xQueueSendFromISR(publishQueue, &myMQTTMessage, &xHigherPriorityTaskWoken);
+		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	}
+
+	HAL_UART_Receive_IT(&huart1, &ch, 1);
 }
 
 void TIM6_Handler() {
