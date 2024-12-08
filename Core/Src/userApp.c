@@ -65,7 +65,7 @@ typedef struct {
 } device_config_t;
 
 typedef struct {
-    char endpoint[30];
+    char endpoint[40];
     char payload[255];
     size_t payloadlen;
     enum QoS qos;
@@ -79,10 +79,10 @@ void timersCallback(TimerHandle_t xTimer) {
 		xEventGroupSetBits(timersEventGroupHandler, temperatureBit);
 	} else if (xTimer == humidityTimerHandler) {
 //		printf("Humidity timer running\r\n");
-		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
+//		xEventGroupSetBits(timersEventGroupHandler, humidityBit);
 	} else if (xTimer == pressureTimerHandler) {
 //		printf("Pressure timer running\r\n");
-		xEventGroupSetBits(timersEventGroupHandler, pressureBit);
+//		xEventGroupSetBits(timersEventGroupHandler, pressureBit);
 	}
 }
 
@@ -170,49 +170,75 @@ void subscribeMessageHandler(MessageData* data)
 	snprintf(mqtt_msg, data->message->payloadlen+1, "%s", (char *)data->message->payload);
 	snprintf(mqtt_topic, data->topicName->lenstring.len+1, "%s", data->topicName->lenstring.data);
 
-	if (strstr(mqtt_topic, "rtos/tempcontrol")) {
-		if (strstr(mqtt_msg, "1.0")) {
-			printf("Turning Temperature Timer Back On\r\n");
-			xTimerStart(temperatureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
-		} else {
-			printf("Turning Temperature Timer Off\r\n");
-			xTimerStop(temperatureTimerHandler, pdMS_TO_TICKS(100));
+	printf("received data from %s\r\n", mqtt_topic);
+	printf("received data: %s\r\n", mqtt_msg);
+
+//	if (strstr(mqtt_topic, "rtos/tempcontrol")) {
+//		if (strstr(mqtt_msg, "1.0")) {
+//			printf("Turning Temperature Timer Back On\r\n");
+//			xTimerStart(temperatureTimerHandler, pdMS_TO_TICKS(100)); // TODO play with this
+//		} else {
+//			printf("Turning Temperature Timer Off\r\n");
+//			xTimerStop(temperatureTimerHandler, pdMS_TO_TICKS(100));
+//		}
+//	} else if (strstr(mqtt_topic, "rtos/presscontrol")) {
+//		if (strstr(mqtt_msg, "1.0")) {
+//			printf("Turning Pressure Timer Back On\r\n");
+//			xTimerStart(pressureTimerHandler, pdMS_TO_TICKS(100));
+//		} else {
+//			printf("Turning Pressure Timer Off\r\n");
+//			xTimerStop(pressureTimerHandler, pdMS_TO_TICKS(100));
+//		}
+//	} else if (strstr(mqtt_topic, "rtos/humidcontrol")) {
+//		if (strstr(mqtt_msg, "1.0")) {
+//			printf("Turning Humidity Timer Back On\r\n");
+//			xTimerStart(humidityTimerHandler, pdMS_TO_TICKS(100));
+//		} else {
+//			printf("Turning Humidity Timer Off\r\n");
+//			xTimerStop(humidityTimerHandler, pdMS_TO_TICKS(100));
+//		}
+//	} else if (strstr(mqtt_topic, "rtos/temptime")) {
+//		uint16_t time = atoi(mqtt_msg);
+//		printf("Setting Temperature Time to: %dms\r\n", time);
+//		xTimerChangePeriod(temperatureTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
+//	} else if (strstr(mqtt_topic, "rtos/presstime")) {
+//		uint16_t time = atoi(mqtt_msg);
+//		printf("Setting Pressure Time to: %dms\r\n", time);
+//		xTimerChangePeriod(pressureTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
+//	} else if (strstr(mqtt_topic, "rtos/humidtime")) {
+//		uint16_t time = atoi(mqtt_msg);
+//		printf("Setting Humidity Time to: %dms\r\n", time);
+//		xTimerChangePeriod(humidityTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
+//	}
+
+	// There are 3 groups in Adafruit. One for each sensor.
+	char temperatureTopic[] = "groups/temperature";
+	if (strstr(mqtt_topic, temperatureTopic)) {
+		char sliderString[] =  "{\"feeds\":{\"temperatureslider\":";
+		char controlString[] = "{\"feeds\":{\"temperaturecontrol\":";
+		if (strstr(mqtt_msg, sliderString)) {
+			char *ptr = mqtt_msg + sizeof(char) * (sizeof(sliderString)/sizeof(char));
+			uint16_t sliderVal = atoi(ptr);
+			printf("Setting Temperature Timer to: %dms\r\n", sliderVal);
+		} else if (strstr(mqtt_msg, "temperaturecontrol")) {
+			char *ptr = mqtt_msg + sizeof(char) * (sizeof(controlString)/sizeof(char));
+			uint8_t state = atoi(ptr);
+			if (state) {
+				printf("Turning Temperature Timer ON\r\n");
+				xTimerStart(temperatureTimerHandler, pdMS_TO_TICKS(20));
+			} else {
+				printf("Turning Temperature Timer OFF\r\n");
+				xTimerStop(temperatureTimerHandler, pdMS_TO_TICKS(20));
+			}
 		}
-	} else if (strstr(mqtt_topic, "rtos/presscontrol")) {
-		if (strstr(mqtt_msg, "1.0")) {
-			printf("Turning Pressure Timer Back On\r\n");
-			xTimerStart(pressureTimerHandler, pdMS_TO_TICKS(100));
-		} else {
-			printf("Turning Pressure Timer Off\r\n");
-			xTimerStop(pressureTimerHandler, pdMS_TO_TICKS(100));
-		}
-	} else if (strstr(mqtt_topic, "rtos/humidcontrol")) {
-		if (strstr(mqtt_msg, "1.0")) {
-			printf("Turning Humidity Timer Back On\r\n");
-			xTimerStart(humidityTimerHandler, pdMS_TO_TICKS(100));
-		} else {
-			printf("Turning Humidity Timer Off\r\n");
-			xTimerStop(humidityTimerHandler, pdMS_TO_TICKS(100));
-		}
-	} else if (strstr(mqtt_topic, "rtos/temptime")) {
-		uint16_t time = atoi(mqtt_msg);
-		printf("Setting Temperature Time to: %dms\r\n", time);
-		xTimerChangePeriod(temperatureTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
-	} else if (strstr(mqtt_topic, "rtos/presstime")) {
-		uint16_t time = atoi(mqtt_msg);
-		printf("Setting Pressure Time to: %dms\r\n", time);
-		xTimerChangePeriod(pressureTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
-	} else if (strstr(mqtt_topic, "rtos/humidtime")) {
-		uint16_t time = atoi(mqtt_msg);
-		printf("Setting Humidity Time to: %dms\r\n", time);
-		xTimerChangePeriod(humidityTimerHandler, pdMS_TO_TICKS(time), pdMS_TO_TICKS(1000));
 	}
 }
 
 static void temperatureTask(void * pvParameters) {
 	MyMQTTMessage mqmsg;
-	char temperature[25];
-	char endpoint[30] = "/v1.6/devices/rtos";
+	char temperature[100];
+//	char endpoint[30] = "/v1.6/devices/rtos";
+	char endpoint[35] = "g00409592/groups/sensorDisplay";
 	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();		//Initialise temperature sensor
 	while(1) {
@@ -221,18 +247,27 @@ static void temperatureTask(void * pvParameters) {
 //				printf("*** Temperature started running ");
 				float tempF = BSP_TSENSOR_ReadTemp();
 				uint16_t tempI = tempF*10;
-				sprintf(temperature, "{\"temperature\":%d.%d}", tempI/10, tempI%10);
+				sprintf(temperature, "{\"feeds\": {\"temperature\":%d.%d}}", tempI/10, tempI%10);
+//				sprintf(humidityStrBuffer, "{\"humidity\":%d.%d}", humidityI/10, humidityI%10);
+
+				printf("Printing before creating MyMQTTMessage: %s\r\n", temperature);
 
 				memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 				mqmsg.qos = QOS0;
+				printf("Printing QOS: %d\r\n", mqmsg.qos);
 				strcpy(mqmsg.payload, temperature);
+				printf("printing payload: %s\r\n", mqmsg.payload);
 				mqmsg.payloadlen = strlen(temperature);
+				printf("printing payloadlen: %d\r\n", mqmsg.payloadlen);
 				strcpy(mqmsg.endpoint, endpoint);
+				printf("printing endpoint: %s\r\n", mqmsg.endpoint);
+				printf("printing endpoint: %s\r\n", mqmsg.endpoint);
+				printf("MyMQTTMessage payload: %s\r\n", mqmsg.payload);
 
 				if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
 					printf("Could not send data to queue. Temperature\r\n");
 				} else queueSize++;
-//				printf(" Temperature finished running *** ");
+				printf(" Temperature finished running *** ");
 				xSemaphoreGive(sensorMutex);
 			}
 		}
@@ -304,7 +339,7 @@ static void publishTask(void * pvParameters) {
 	MQTTMessage mqmsg;
 	printf("Starting publish task\r\n");
 	while (1) {
-		if (xQueueReceive(publishQueue, &msgToPublish, 0) == pdPASS) {
+		if (xQueueReceive(publishQueue, &msgToPublish, pdMS_TO_TICKS(10)) == pdPASS) {
 			printf("Publishing message: %s. Current queue size: %d\r\n", msgToPublish.payload, queueSize);
 
 			memset(&mqmsg, 0, sizeof(MQTTMessage));
@@ -350,6 +385,52 @@ static void RTC_Task(void * pvParameters) {
 	}
 }
 
+void createSensorTasks() {
+	// Temperature task
+	if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
+		printf("Temperature task created\n\r");
+	} else printf("Could not create temperature task\n\r");
+
+	// Humidity task
+	if(xTaskCreate(humidityTask, "Humidity Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
+		printf("Humidity task created\n\r");
+	} else printf("Could not create Humidity Task\n\r");
+
+	// Pressure task
+	if(xTaskCreate(pressureTask, "Pressure Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
+		printf("Pressure task created\r\n");
+	} else printf("Could not create Pressure Task\r\n");
+}
+
+void performSubscriptions() {
+	uint32_t ret;
+	ret = MQTTSubscribe(&client, "g00409592/groups/temperature", QOS0, subscribeMessageHandler);
+	ret = MQTTYield(&client, 500);
+	if (ret != MQSUCCESS) printf("\n\rSubscribe to temperature failed: %ld\n\r", ret);
+
+	HAL_IWDG_Refresh(&hiwdg);
+
+	ret = MQTTSubscribe(&client, "g00409592/groups/humidity", QOS0, subscribeMessageHandler);
+	ret = MQTTYield(&client, 500);
+	if (ret != MQSUCCESS) printf("\n\rSubscribe to humidity group failed: %ld\n\r", ret);
+
+	HAL_IWDG_Refresh(&hiwdg);
+
+	ret = MQTTSubscribe(&client, "g00409592/groups/pressure", QOS0, subscribeMessageHandler);
+	ret = MQTTYield(&client, 500);
+	if (ret != MQSUCCESS) printf("\n\rSubscribe to pressure group failed: %ld\n\r", ret);
+
+//	ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presstime/lv", QOS0, (subscribeMessageHandler));
+//	if (ret != MQSUCCESS) {
+//		printf("\n\rSubscribe to Pressure Time failed: %ld\n\r", ret);
+//	}
+//	else {
+//		printf("\n\rSubscribed to Pressure Time topic \n\r");
+//		ret = MQTTYield(&client, 5000);
+//	}
+//	HAL_IWDG_Refresh(&hiwdg);
+}
+
 /*--------------------------------------
  * Initialisation Task
  * 1. Connects to ubidots MQTT broker
@@ -360,7 +441,7 @@ static void RTC_Task(void * pvParameters) {
  * 6. Task delates itself
  ----------------------------------------*/
 static void initTask(void * pvParameters) {
-	uint32_t ret;
+//	uint32_t ret;
 	printf("Starting Init Task\r\n");
 
 	while(1) {
@@ -385,20 +466,7 @@ static void initTask(void * pvParameters) {
 		publishQueue = xQueueCreate(5, sizeof(MyMQTTMessage));
 		vQueueAddToRegistry(publishQueue, "Publish Queue");
 
-		// Temperature task
-		if(xTaskCreate(temperatureTask, "Temperature Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
-			printf("Temperature task created\n\r");
-		} else printf("Could not create temperature task\n\r");
-
-		// Humidity task
-		if(xTaskCreate(humidityTask, "Humidity Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
-			printf("Humidity task created\n\r");
-		} else printf("Could not create Humidity Task\n\r");
-
-		// Pressure task
-		if(xTaskCreate(pressureTask, "Pressure Task", 500, NULL, configMAX_PRIORITIES - 4, NULL) == pdTRUE) {
-			printf("Pressure task created\r\n");
-		} else printf("Could not create Pressure Task\r\n");
+		createSensorTasks();
 
 		// Publish task
 		if(xTaskCreate(publishTask, "Publish Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
@@ -432,6 +500,7 @@ static void initTask(void * pvParameters) {
 				printf("Humidity timer start failed.\r\n");
 			}
 		}
+		HAL_IWDG_Refresh(&hiwdg);
 
 		// Pressure timer creation
 		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
@@ -444,62 +513,70 @@ static void initTask(void * pvParameters) {
 				printf("Humidity timer start failed.\r\n");
 			}
 		}
+		HAL_IWDG_Refresh(&hiwdg);
 
 		//Subscribe to topics here
 		//change the device name and variable name in the function call to match your Ubidots configuration
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/temptime/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Temperature Time failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Temperature Time topic \n\r");
-		}
-
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presstime/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Pressure Time failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Pressure Time topic \n\r");
-		}
-
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/humidtime/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Humidity Time failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Humidity Time topic \n\r");
-		}
-
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Temperature Control failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Temperature Control topic \n\r");
-		}
-
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presscontrol/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Pressure Control failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Pressure Control topic \n\r");
-		}
-
-		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/humidcontrol/lv", QOS0, (subscribeMessageHandler));
-		if (ret != MQSUCCESS) {
-			printf("\n\rSubscribe to Humidity Control failed: %ld\n\r", ret);
-			ret = MQTTYield(&client, 500);
-		}
-		else {
-			printf("\n\rSubscribed to Humidity Control topic \n\r");
-		}
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/temptime/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Temperature Time failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Temperature Time topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+//		HAL_IWDG_Refresh(&hiwdg);
+//
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presstime/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Pressure Time failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Pressure Time topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+//		HAL_IWDG_Refresh(&hiwdg);
+//
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/humidtime/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Humidity Time failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Humidity Time topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+//		HAL_IWDG_Refresh(&hiwdg);
+//
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/tempcontrol/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Temperature Control failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Temperature Control topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+//		HAL_IWDG_Refresh(&hiwdg);
+//
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/presscontrol/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Pressure Control failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Pressure Control topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+//		HAL_IWDG_Refresh(&hiwdg);
+//
+//		ret = MQTTSubscribe(&client, "/v1.6/devices/rtos/humidcontrol/lv", QOS0, (subscribeMessageHandler));
+//		if (ret != MQSUCCESS) {
+//			printf("\n\rSubscribe to Humidity Control failed: %ld\n\r", ret);
+//		}
+//		else {
+//			printf("\n\rSubscribed to Humidity Control topic \n\r");
+//			ret = MQTTYield(&client, 5000);
+//		}
+		HAL_IWDG_Refresh(&hiwdg);
+		performSubscriptions();
 
 //		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
 //		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
