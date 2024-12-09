@@ -174,7 +174,7 @@ void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart) {
 		publishDataToThreeGroupsISR(8000, 0, 8000, 0, 8000, 1, mqmsg, &xHigherPriorityTaskWoken);
 		break;
 	case 'c':
-		printf("%c[2J\r\n", 27);
+		printf("\033[2J\033[3J\033[H\r\n"); // \033[2J Clears Screen, \033[3J Clears scrollback buff, \033[H resets cursor pos
 		break;
 	default:
 		printf("Pressing %c does nothing.\r\n", ch);
