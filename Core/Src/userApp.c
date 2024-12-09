@@ -36,7 +36,7 @@ static void RTC_Task(void * pvParameters);
 #define humidityBit (1 << 1)
 #define pressureBit (1 << 2)
 
-SemaphoreHandle_t publishSemaphore = NULL, oneSecondSemaphore = NULL, publishHumiditySemaphore = NULL, sensorMutex = NULL, queueSizeMutex = NULL;
+SemaphoreHandle_t publishSemaphore = NULL, publishHumiditySemaphore = NULL, sensorMutex = NULL, queueSizeMutex = NULL;
 TimerHandle_t temperatureTimerHandler = NULL, humidityTimerHandler = NULL, pressureTimerHandler = NULL;
 EventGroupHandle_t timersEventGroupHandler = NULL;
 QueueHandle_t publishQueue = NULL;
@@ -136,6 +136,9 @@ void publishDataToThreeGroupsISR(
 		uint16_t pressureTime, uint8_t pressureControl,
 		uint16_t humidityTime, uint8_t humidityControl,
 		MyMQTTMessage mqmsg, BaseType_t *xHigherPriorityTaskWoken) {
+	/*
+	 * I can't publish and update the values with a single publish because they are each on different groups.
+	 */
 	publishDataToGroupISR("temperature", tempTime, tempControl, mqmsg, xHigherPriorityTaskWoken);
 	publishDataToGroupISR("pressure", pressureTime, pressureControl, mqmsg, xHigherPriorityTaskWoken);
 	publishDataToGroupISR("humidity", humidityTime, humidityControl, mqmsg, xHigherPriorityTaskWoken);
@@ -147,34 +150,35 @@ void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart) {
 
 	memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 	mqmsg.qos = QOS0;
-	/*
-	 * I can't publish and update the values at the same time because they are each on a different group.
-	 */
-	printf("in rxCpltCallback\r\n");
+
 	switch (ch) {
-	case 'r':
+	case 'r': // Reset back to default
 		publishDataToThreeGroupsISR(8000, 1, 8000, 1, 8000, 1, mqmsg, &xHigherPriorityTaskWoken);
 		break;
-	case '1':
-		publishDataToThreeGroupsISR(4000, 1, 35000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
-		break;
-	case '2':
-		publishDataToThreeGroupsISR(35000, 1, 4000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
-		break;
-	case '3':
-		publishDataToThreeGroupsISR(35000, 1, 35000, 1, 4000, 1, mqmsg, &xHigherPriorityTaskWoken);
-		break;
-	case '4':
+	case '0':  // Turn all off
 		publishDataToThreeGroupsISR(8000, 0, 8000, 0, 8000, 0, mqmsg, &xHigherPriorityTaskWoken);
 		break;
-	case '5':
+	case '1': // All on, quick temp
+		publishDataToThreeGroupsISR(4000, 1, 35000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '2': // All on quick pressure
+		publishDataToThreeGroupsISR(35000, 1, 4000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '3': // All on quick humidity
+		publishDataToThreeGroupsISR(35000, 1, 35000, 1, 4000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '4': // Only temp on
+		publishDataToThreeGroupsISR(8000, 1, 8000, 0, 8000, 0, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '5': // Only pressure on
 		publishDataToThreeGroupsISR(8000, 0, 8000, 1, 8000, 0, mqmsg, &xHigherPriorityTaskWoken);
 		break;
-	case '6':
+	case '6': // Only humidity on
 		publishDataToThreeGroupsISR(8000, 0, 8000, 0, 8000, 1, mqmsg, &xHigherPriorityTaskWoken);
 		break;
 	case 'c':
 		printf("\033[2J\033[3J\033[H\r\n"); // \033[2J Clears Screen, \033[3J Clears scrollback buff, \033[H resets cursor pos
+		// https://en.wikipedia.org/wiki/ANSI_escape_code
 		break;
 	default:
 		printf("Pressing %c does nothing.\r\n", ch);
@@ -184,13 +188,6 @@ void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart) {
 }
 
 void TIM6_Handler() {
-
-//	printf("Running TIM6 Handler\r\n");
-//	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-//	xSemaphoreGiveFromISR(publishHumiditySemaphore, &xHigherPriorityTaskWoken);
-//	xTaskNotifyFromISR(toggleLedHandler, (uint32_t) 1, eSetValueWithOverwrite, &xHigherPriorityTaskWoken);
-//	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-
 }
 
 /*--------------------------------------------------------------------
@@ -198,12 +195,9 @@ void TIM6_Handler() {
  * Runs every second and gives a semaphore if the RTC task is running
  --------------------------------------------------------------------*/
 void HAL_RTCEx_WakeUpTimerEventCallback (RTC_HandleTypeDef * hrtc) {
-	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-	if(RTC_TaskRunning){
-		xHigherPriorityTaskWoken = pdFALSE;
-		xSemaphoreGiveFromISR(oneSecondSemaphore, &xHigherPriorityTaskWoken);
-		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-	}
+	/*
+	 * Removed the code. Didn't use it. Didn't need oneSecondSemaphore
+	 */
 }
 
 void subscribeLogic(char mqtt_msg[], char slider[], char control[], TimerHandle_t timerHandler, char loggingName[]) {
@@ -380,27 +374,14 @@ static void publishTask(void * pvParameters) {
  * Task to print the date and time when a semaphore is taken
 -------------------------------------------------------------*/
 static void RTC_Task(void * pvParameters) {
-	RTC_TimeTypeDef sTime;
-	RTC_DateTypeDef sDate;
-//	char timeBuffer[40];
-	uint32_t count = 0;
-
 	RTC_TaskRunning = 1;	//flag set to allow RTC event interrupt handler callback to send semaphores
 
 	while(1) {
 		MQTTYield(&client, 200);	//Yield needed to allow check for received published messages from subscribed topics
+		timeDisplay = 0;
 
-//		if(xSemaphoreTake(oneSecondSemaphore, 0) == pdTRUE) {
-			count++;
-//			if (count % 5 == 0) { // print every 5 seconds
-				timeDisplay = 0;
-				HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
-				HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
-				if (client.isconnected) HAL_IWDG_Refresh(&hiwdg);
-//				sprintf(timeBuffer, "%02d/%02d/%02d %02d:%02d:%02d\r\n", sDate.Date, sDate.Month, sDate.Year, sTime.Hours+1, sTime.Minutes, sTime.Seconds);
-//				printf("%s", timeBuffer);
-//			}
-//		}
+		if (client.isconnected) HAL_IWDG_Refresh(&hiwdg);
+
 		vTaskDelay(pdMS_TO_TICKS(200));
 	}
 }
@@ -449,6 +430,19 @@ void getLatestValues() {
 	MQTTPublish(&client, "g00409592/groups/pressure/get", &mqmsg);
 }
 
+void createTimer(TimerHandle_t *timerHandler, char timerName[], uint16_t initialDelay) {
+	*timerHandler = xTimerCreate(timerName, pdMS_TO_TICKS(initialDelay), pdTRUE, NULL, timersCallback);
+	if (*timerHandler == NULL) {
+		printf("%s timer creation failed.\r\n", timerName);
+	} else {
+		if (xTimerStart(*timerHandler, 0) == pdTRUE) {
+			printf("%s timer started.\r\n", timerName);
+		} else {
+			printf("%s timer start failed.\r\n", timerName);
+		}
+	}
+}
+
 /*--------------------------------------
  * Initialisation Task
  * 1. Connects to ubidots MQTT broker
@@ -465,9 +459,6 @@ static void initTask(void * pvParameters) {
 	while(1) {
 		HAL_GPIO_WritePin(LED2_GPIO_Port, LED2_Pin, GPIO_PIN_RESET);
 		brokerConnect(&client);	//connect to WiFi access point and then to MQTT broker
-
-		oneSecondSemaphore = xSemaphoreCreateBinary();
-		vQueueAddToRegistry(oneSecondSemaphore, "RTC Semaphore");
 
 		sensorMutex = xSemaphoreCreateMutex();
 		vQueueAddToRegistry(sensorMutex, "Sensor Mutex");
@@ -489,8 +480,6 @@ static void initTask(void * pvParameters) {
 
 		createSensorTasks();
 
-
-
 		// Publish task
 		if(xTaskCreate(publishTask, "Publish Task", 500, NULL, configMAX_PRIORITIES - 3, NULL) == pdTRUE) {
 			printf("Publish task created\n\r");
@@ -501,16 +490,20 @@ static void initTask(void * pvParameters) {
 		} else printf("Could not create RTC task\n\r");
 
 		// Temperature timer creation
-		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
-		if (temperatureTimerHandler == NULL) {
-			printf("Temperature timer creation failed.\r\n");
-		} else {
-			if (xTimerStart(temperatureTimerHandler, 0) == pdTRUE) {
-				printf("Temperature timer started.\r\n");
-			} else {
-				printf("Temperature timer start failed.\r\n");
-			}
-		}
+//		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
+//		if (temperatureTimerHandler == NULL) {
+//			printf("Temperature timer creation failed.\r\n");
+//		} else {
+//			if (xTimerStart(temperatureTimerHandler, 0) == pdTRUE) {
+//				printf("Temperature timer started.\r\n");
+//			} else {
+//				printf("Temperature timer start failed.\r\n");
+//			}
+//		}
+
+		createTimer(&temperatureTimerHandler, "Temperature", 8000);
+		createTimer(&humidityTimerHandler, "Humidity", 8000);
+		createTimer(&pressureTimerHandler, "Pressure", 8000);
 
 		// Humidity timer creation
 		humidityTimerHandler = xTimerCreate("Humidity timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
