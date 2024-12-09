@@ -250,98 +250,60 @@ void subscribeMessageHandler(MessageData* data)
 	}
 }
 
-static void temperatureTask(void * pvParameters) {
+void buildMessageAndSendToQueue(uint16_t valueI, char sensorName[]) {
+	char buff[100], endpoint[] = "g00409592/groups/sensorDisplay";
 	MyMQTTMessage mqmsg;
-	char temperature[100];
-	char endpoint[35] = "g00409592/groups/sensorDisplay";
+
+	sprintf(buff, "{\"feeds\": {\"%s\":%d.%d}}", sensorName, valueI/10, valueI%10);
+
+	memset(&mqmsg, 0, sizeof(MyMQTTMessage));
+	strcpy(mqmsg.endpoint, endpoint);
+	mqmsg.qos = QOS0;
+	strcpy(mqmsg.payload, buff);
+	mqmsg.payloadlen = strlen(buff);
+
+	if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
+		printf("Could not send data to queue. Temperature\r\n");
+	} else {
+		xSemaphoreTake(queueSizeMutex, portMAX_DELAY);
+		queueSize++;
+		xSemaphoreGive(queueSizeMutex);
+	}
+}
+
+static void temperatureTask(void * pvParameters) {
 	printf("Starting Temperature Publish Task\r\n");
 	BSP_TSENSOR_Init();
 	while(1) {
 		if (xEventGroupWaitBits(timersEventGroupHandler, temperatureBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
-			if (xSemaphoreTake(sensorMutex, portMAX_DELAY) == pdTRUE) {
-				float tempF = BSP_TSENSOR_ReadTemp();
-				uint16_t tempI = tempF*10;
-				sprintf(temperature, "{\"feeds\": {\"temperature\":%d.%d}}", tempI/10, tempI%10);
+			float tempF = BSP_TSENSOR_ReadTemp();
+			uint16_t tempI = tempF*10;
 
-				memset(&mqmsg, 0, sizeof(MyMQTTMessage));
-				mqmsg.qos = QOS0;
-				strcpy(mqmsg.payload, temperature);
-				mqmsg.payloadlen = strlen(temperature);
-				strcpy(mqmsg.endpoint, endpoint);
-
-				if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
-					printf("Could not send data to queue. Temperature\r\n");
-				} else {
-					xSemaphoreTake(queueSizeMutex, portMAX_DELAY);
-					queueSize++;
-					xSemaphoreGive(queueSizeMutex);
-				}
-				xSemaphoreGive(sensorMutex);
-			}
+			buildMessageAndSendToQueue(tempI, "temperature");
 		}
 	}
 }
 
 static void humidityTask(void * pvParameters) {
-	MyMQTTMessage mqmsg;
-	char humidityStrBuffer[50];
-	char endpoint[35] = "g00409592/groups/sensorDisplay";
 	printf("Starting Humidity Publish Task\r\n");
 	BSP_HSENSOR_Init();
 	while(1) {
 		if (xEventGroupWaitBits(timersEventGroupHandler, humidityBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
-			if (xSemaphoreTake(sensorMutex, portMAX_DELAY) == pdTRUE) {
-				float humidityF = BSP_HSENSOR_ReadHumidity();
-				uint16_t humidityI = humidityF*10;
-				sprintf(humidityStrBuffer, "{\"feeds\": {\"humidity\":%d.%d}}", humidityI/10, humidityI%10);
-
-				memset(&mqmsg, 0, sizeof(MyMQTTMessage));
-				mqmsg.qos = QOS0;
-				strcpy(mqmsg.payload, humidityStrBuffer);
-				mqmsg.payloadlen = strlen(humidityStrBuffer);
-				strcpy(mqmsg.endpoint, endpoint);
-
-				if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
-					printf("Could not send data to queue. Humidity\r\n");
-				} else {
-					xSemaphoreTake(queueSizeMutex, portMAX_DELAY);
-					queueSize++;
-					xSemaphoreGive(queueSizeMutex);
-				}
-				xSemaphoreGive(sensorMutex);
-			}
+			float humidityF = BSP_HSENSOR_ReadHumidity();
+			uint16_t humidityI = humidityF*10;
+			buildMessageAndSendToQueue(humidityI, "humidity");
 		}
 	}
 }
 
 static void pressureTask(void * pvParameters) {
-	MyMQTTMessage mqmsg;
-	char pressureStrBuffer[50];
-	char endpoint[35] = "g00409592/groups/sensorDisplay";
 	printf("Starting Pressure Sensor Task\r\n");
 	BSP_PSENSOR_Init();
 	while(1) {
 		if (xEventGroupWaitBits(timersEventGroupHandler, pressureBit, pdTRUE, pdFALSE, portMAX_DELAY)) {
-			if (xSemaphoreTake(sensorMutex, portMAX_DELAY) == pdTRUE) {
-				float pressureF = BSP_PSENSOR_ReadPressure();
-				uint16_t pressureI = pressureF*10;
-				sprintf(pressureStrBuffer, "{\"feeds\": {\"pressure\":%d.%d}}", pressureI/10, pressureI%10);
-
-				memset(&mqmsg, 0, sizeof(MyMQTTMessage));
-				mqmsg.qos = QOS0;
-				strcpy(mqmsg.payload, pressureStrBuffer);
-				mqmsg.payloadlen = strlen(pressureStrBuffer);
-				strcpy(mqmsg.endpoint, endpoint);
-
-				if (xQueueSend(publishQueue, &mqmsg, 0) != pdPASS) {
-					printf("Could not send data to queue. Pressure\r\n");
-				} else {
-					xSemaphoreTake(queueSizeMutex, portMAX_DELAY);
-					queueSize++;
-					xSemaphoreGive(queueSizeMutex);
-				}
-				xSemaphoreGive(sensorMutex);
-			}
+			float pressureF = BSP_PSENSOR_ReadPressure();
+			uint16_t pressureI = pressureF*10;
+			buildMessageAndSendToQueue(pressureI, "pressure");
 		}
 	}
 }
@@ -489,57 +451,19 @@ static void initTask(void * pvParameters) {
 			printf("RTC task created\n\r");
 		} else printf("Could not create RTC task\n\r");
 
-		// Temperature timer creation
-//		temperatureTimerHandler = xTimerCreate("Temperature timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
-//		if (temperatureTimerHandler == NULL) {
-//			printf("Temperature timer creation failed.\r\n");
-//		} else {
-//			if (xTimerStart(temperatureTimerHandler, 0) == pdTRUE) {
-//				printf("Temperature timer started.\r\n");
-//			} else {
-//				printf("Temperature timer start failed.\r\n");
-//			}
-//		}
-
+		// Create Software Timers
 		createTimer(&temperatureTimerHandler, "Temperature", 8000);
 		createTimer(&humidityTimerHandler, "Humidity", 8000);
 		createTimer(&pressureTimerHandler, "Pressure", 8000);
 
-		// Humidity timer creation
-		humidityTimerHandler = xTimerCreate("Humidity timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
-		if (humidityTimerHandler == NULL) {
-			printf("Humidity timer creation failed.\r\n");
-		} else {
-			if (xTimerStart(humidityTimerHandler, 0) == pdTRUE) {
-				printf("Humidity timer started.\r\n");
-			} else {
-				printf("Humidity timer start failed.\r\n");
-			}
-		}
 		HAL_IWDG_Refresh(&hiwdg);
 
-		// Pressure timer creation
-		pressureTimerHandler = xTimerCreate("Pressure timer", pdMS_TO_TICKS(5000), pdTRUE, NULL, timersCallback);
-		if (pressureTimerHandler == NULL) {
-			printf("Pressure timer creation failed.\r\n");
-		} else {
-			if (xTimerStart(pressureTimerHandler, 0) == pdTRUE) {
-				printf("Pressure timer started.\r\n");
-			} else {
-				printf("Humidity timer start failed.\r\n");
-			}
-		}
-
-		HAL_IWDG_Refresh(&hiwdg);
-
+		// Subscribe to the Control Switches and The Time Sliders
 		performSubscriptions();
+		// Get current state of those to get in-sync
 		getLatestValues();
 
-
-//		__HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
-//		HAL_NVIC_GetPendingIRQ(TIM6_DAC_IRQn);
-//		HAL_TIM_Base_Start_IT(&htim6);
-
+		// Enable UART Interrupt
 		HAL_UART_Receive_IT(&huart1, &ch, 1);
 
 		printf("Deleting Init Task\r\n\n");
