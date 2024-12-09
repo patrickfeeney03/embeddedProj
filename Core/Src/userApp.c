@@ -131,23 +131,55 @@ void publishDataToGroupISR(char sensorName[], uint16_t slider, bool control, MyM
 	}
 }
 
+void publishDataToThreeGroupsISR(
+		uint16_t tempTime, uint8_t tempControl,
+		uint16_t pressureTime, uint8_t pressureControl,
+		uint16_t humidityTime, uint8_t humidityControl,
+		MyMQTTMessage mqmsg, BaseType_t *xHigherPriorityTaskWoken) {
+	publishDataToGroupISR("temperature", tempTime, tempControl, mqmsg, xHigherPriorityTaskWoken);
+	publishDataToGroupISR("pressure", pressureTime, pressureControl, mqmsg, xHigherPriorityTaskWoken);
+	publishDataToGroupISR("humidity", humidityTime, humidityControl, mqmsg, xHigherPriorityTaskWoken);
+}
+
 void HAL_UART_RxCpltCallback (UART_HandleTypeDef * huart) {
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 	MyMQTTMessage mqmsg;
 
 	memset(&mqmsg, 0, sizeof(MyMQTTMessage));
 	mqmsg.qos = QOS0;
-
-	if (ch == 'r') {
-		printf("Received character R\r\n");
-		/*
-		 * I can't publish and update the values at the same time because they are each on a different group.
-		 */
-		publishDataToGroupISR("temperature", 6000, 0, mqmsg, &xHigherPriorityTaskWoken);
-		publishDataToGroupISR("pressure", 6000, 0, mqmsg, &xHigherPriorityTaskWoken);
-		publishDataToGroupISR("humidity", 6000, 0, mqmsg, &xHigherPriorityTaskWoken);
-		portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+	/*
+	 * I can't publish and update the values at the same time because they are each on a different group.
+	 */
+	printf("in rxCpltCallback\r\n");
+	switch (ch) {
+	case 'r':
+		publishDataToThreeGroupsISR(8000, 1, 8000, 1, 8000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '1':
+		publishDataToThreeGroupsISR(4000, 1, 35000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '2':
+		publishDataToThreeGroupsISR(35000, 1, 4000, 1, 35000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '3':
+		publishDataToThreeGroupsISR(35000, 1, 35000, 1, 4000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '4':
+		publishDataToThreeGroupsISR(8000, 0, 8000, 0, 8000, 0, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '5':
+		publishDataToThreeGroupsISR(8000, 0, 8000, 1, 8000, 0, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case '6':
+		publishDataToThreeGroupsISR(8000, 0, 8000, 0, 8000, 1, mqmsg, &xHigherPriorityTaskWoken);
+		break;
+	case 'c':
+		printf("%c[2J\r\n", 27);
+		break;
+	default:
+		printf("Pressing %c does nothing.\r\n", ch);
 	}
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	HAL_UART_Receive_IT(&huart1, &ch, 1);
 }
 
