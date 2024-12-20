@@ -24,15 +24,15 @@
  * For Adafruit use your username
  * For Ubidots use your device token
  */
-//#define CloudBroker_Username "nokeeffe"
-#define CloudBroker_Username "g00409592"
+//#define CloudBroker_Username ""
+#define CloudBroker_Username ""
 
 /*
  * For Adafruit use "your active key
  * For Ubidots use an empty password ""
  */
-#define CloudBroker_Password "aio_JzsE33mjBivyW0cUjJRK1tLVbewM"
-//#define CloudBroker_Password "aio_otlP359Ckvb2gGDYiApu8b54GG3d"
+#define CloudBroker_Password ""
+//#define CloudBroker_Password ""
 
 
 /*

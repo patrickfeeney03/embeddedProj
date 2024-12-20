@@ -8,7 +8,7 @@
 #ifndef INC_WIFI_CREDENTIALS_H_
 #define INC_WIFI_CREDENTIALS_H_
 
-#define SSID     "POCO F5"
-#define PASSWORD "parque2021"
+#define SSID ""
+#define PASSWORD ""
 
 #endif /* INC_WIFI_CREDENTIALS_H_ */
