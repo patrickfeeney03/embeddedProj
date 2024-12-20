@@ -2,6 +2,8 @@ This is a Project that I did for my Embedded Real Time Operating Systems Class.
 
 I use FreeRTOS and MQTT Paho. The board is an STM32 Discovery Kit B-L475E-IOT01A1.
 
+To edit the project and genereate required code I've used the STM32CubeIDE.
+
 This is a weather station that uses Software Timers to trigger multiple FreeRTOS tasks to read and publish data. I've used multiple Communication Objects such as a Queue-by-copy and an Event Group.
 
 I used Adafruit IO as the MQTT Broker. This is what my dashboard looks like:
